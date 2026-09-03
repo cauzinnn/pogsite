@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PogMoment ECI — Blueprint Interativo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bp-bg: #07101d;
+      --bp-surface: #0c1a2e;
+      --bp-surface-hover: #12243d;
+      --bp-line: #193557;
+      --bp-line-bright: #2d629d;
+      --bp-grid: rgba(45, 98, 157, 0.12);
+      
+      --bp-text: #e2f1ff;
+      --bp-text-dim: #7da3cc;
+      --bp-text-muted: #3d5e85;
+
+      --cyan: #38bdf8;
+      --green: #10b981;
+      --amber: #f59e0b;
+      --violet: #a78bfa;
+
+      --rarity-c: #7da3cc;
+      --rarity-i: #10b981;
+      --rarity-r: #38bdf8;
+      --rarity-sr: #a78bfa;
+      --rarity-ssr: #f59e0b;
+
+      --font-display: 'Chakra Petch', sans-serif;
+      --font-mono: 'Share Tech Mono', monospace;
+      --font-body: 'IBM Plex Sans', -apple-system, sans-serif;
+
+      --radius-sm: 4px;
+      --radius-md: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bp-bg);
+      background-image: 
+        linear-gradient(var(--bp-grid) 1px, transparent 1px),
+        linear-gradient(90deg, var(--bp-grid) 1px, transparent 1px);
+      background-size: 24px 24px;
+      color: var(--bp-text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Minimal Blueprint Header */
+    header.bp-header {
+      background: rgba(12, 26, 46, 0.95);
+      border-bottom: 1px solid var(--bp-line-bright);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.85rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-stamp {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+      letter-spacing: 0.1em;
+      background: rgba(56, 189, 248, 0.08);
+      border-radius: var(--radius-sm);
+    }
+
+    .brand-titles h1 {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #fff;
+    }
+
+    .brand-titles p {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--bp-text-dim);
+    }
+
+    /* Clean Status Metrics */
+    .status-strip {
+      display: flex;
+      align-items: center;
+      background: var(--bp-bg);
+      border: 1px solid var(--bp-line);
+      border-radius: var(--radius-sm);
+      padding: 0.35rem 0.85rem;
+      gap: 1.25rem;
+    }
+
+    .status-cell {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cell-lbl {
+      font-family: var(--font-mono);
+      font-size: 0.62rem;
+      color: var(--bp-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .cell-val {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    .cell-val.amber { color: var(--amber); }
+    .cell-val.green { color: var(--green); }
+
+    /* Action Buttons */
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .btn-bp {
+      background: var(--bp-surface);
+      color: var(--bp-text);
+      border: 1px solid var(--bp-line);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      padding: 0.45rem 0.8rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.15s ease;
+      text-transform: uppercase;
+    }
+
+    .btn-bp:hover {
+      border-color: var(--bp-line-bright);
+      color: #fff;
+      background: var(--bp-surface-hover);
+    }
+
+    .btn-bp.primary {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+
+    .btn-bp.primary:hover {
+      background: var(--cyan);
+      color: var(--bp-bg);
+    }
+
+    /* Minimal Tabs Bar */
+    nav.bp-tabs-bar {
+      background: rgba(7, 16, 29, 0.9);
+      border-bottom: 1px solid var(--bp-line);
+    }
+
+    .tabs-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      display: flex;
+      gap: 2rem;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--bp-text-dim);
+      padding: 0.85rem 0.2rem;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.15s ease;
+    }
+
+    .tab-btn:hover { color: #fff; }
+    .tab-btn.active {
+      color: var(--cyan);
+    }
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--cyan);
+      box-shadow: 0 0 10px var(--cyan);
+    }
+
+    /* Layout View */
+    main.bp-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+      flex: 1;
+      width: 100%;
+    }
+
+    .tab-pane {
+      display: none;
+      animation: fadeIn 0.2s ease;
+    }
+    .tab-pane.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ========================================================
+       TAB 1: ROLETA / GACHA ARENA (CLEAN & CENTERED)
+       ======================================================== */
+    .gacha-stage-container {
+      max-width: 720px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stage-title {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .stage-title h2 {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #fff;
+    }
+
+    .stage-title p {
+      font-size: 0.85rem;
+      color: var(--bp-text-dim);
+      margin-top: 0.35rem;
+    }
+
+    /* 3D Specimen Card */
+    .card-chamber {
+      width: 280px;
+      height: 395px;
+      perspective: 1200px;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+
+    .chamber-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.75s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+      transform-style: preserve-3d;
+      border-radius: var(--radius-md);
+    }
+
+    .chamber-inner.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-plane {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--bp-line-bright);
+      background: var(--bp-surface);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Card Back */
+    .card-plane.back {
+      background: radial-gradient(circle at center, #0e2440 0%, #06101d 100%);
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .blueprint-logo {
+      width: 76px;
+      height: 76px;
+      border: 1px dashed var(--cyan);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-bottom: 1rem;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.15);
+    }
+
+    .back-tagline {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.05em;
+    }
+
+    .back-sub {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--bp-text-dim);
+      margin-top: 0.25rem;
+    }
+
+    /* Card Front */
+    .card-plane.front {
+      transform: rotateY(180deg);
+      padding: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      background: var(--bp-surface);
+    }
+
+    .card-meta-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--bp-line);
+      padding-bottom: 0.4rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .card-code {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--bp-text-dim);
+    }
+
+    .card-rarity-pill {
+      font-family: var(--font-display);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 1px 7px;
+      border: 1px solid currentColor;
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+    }
+
+    .card-img-wrap {
+      width: 100%;
+      height: 180px;
+      border: 1px solid var(--bp-line);
+      border-radius: var(--radius-sm);
+      background: var(--bp-bg);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-info-block {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      flex: 1;
+    }
+
+    .card-title-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .card-name {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .card-type-lbl {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--bp-text-dim);
+      text-transform: uppercase;
+    }
+
+    .card-desc-txt {
+      font-size: 0.75rem;
+      color: var(--bp-text-dim);
+      line-height: 1.35;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-top: 0.2rem;
+    }
+
+    .card-bottom-val {
+      margin-top: auto;
+      border-top: 1px dashed var(--bp-line);
+      padding-top: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+    }
+
+    /* Rarities Colors */
+    .rarity-C .card-rarity-pill { color: var(--rarity-c); }
+    .rarity-I .card-rarity-pill { color: var(--rarity-i); }
+    .rarity-R .card-rarity-pill { color: var(--rarity-r); }
+    .rarity-SR .card-rarity-pill { color: var(--rarity-sr); }
+    .rarity-SSR .card-rarity-pill { color: var(--rarity-ssr); }
+    .rarity-SSR { border-color: var(--amber) !important; box-shadow: 0 0 25px rgba(245, 158, 11, 0.25) !important; }
+
+    /* Controls Strip */
+    .controls-strip {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .btn-pull-action {
+      width: 100%;
+      padding: 0.95rem;
+      background: var(--bp-line-bright);
+      color: #fff;
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      border: 1px solid var(--cyan);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.25);
+      transition: all 0.2s ease;
+    }
+
+    .btn-pull-action:hover:not(:disabled) {
+      background: var(--cyan);
+      color: var(--bp-bg);
+    }
+
+    .btn-pull-action:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .choices-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.2s ease;
+    }
+
+    .choices-row.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .btn-choice {
+      background: var(--bp-surface);
+      border: 1px solid var(--bp-line);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem;
+      cursor: pointer;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      transition: all 0.15s ease;
+    }
+
+    .btn-choice:hover:not(:disabled) {
+      border-color: var(--cyan);
+      background: var(--bp-surface-hover);
+    }
+
+    .btn-choice.commit { border-left: 3px solid var(--cyan); }
+    .btn-choice.deploy { border-left: 3px solid var(--green); }
+
+    .btn-choice .c-title {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .btn-choice .c-desc {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--bp-text-dim);
+    }
+
+    /* Clean Workspace Shelf (Horizontal, uncrowded) */
+    .shelf-container {
+      width: 100%;
+      max-width: 900px;
+      margin-top: 3.5rem;
+      border-top: 1px solid var(--bp-line);
+      padding-top: 1.5rem;
+    }
+
+    .shelf-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .shelf-header h3 {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--bp-text-dim);
+    }
+
+    .shelf-deck {
+      display: flex;
+      gap: 0.75rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+
+    .shelf-item {
+      background: var(--bp-surface);
+      border: 1px solid var(--bp-line);
+      border-radius: var(--radius-sm);
+      padding: 0.5rem 0.65rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      min-width: 180px;
+      flex-shrink: 0;
+    }
+
+    .shelf-thumb {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      background: var(--bp-bg);
+      border: 1px solid var(--bp-line);
+    }
+
+    .shelf-info {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .shelf-name {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .shelf-sub {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--bp-text-dim);
+    }
+
+    /* ========================================================
+       TAB 2: GRADE CURRICULAR DE MATÉRIAS
+       ======================================================== */
+    .bonus-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .bonus-card {
+      background: var(--bp-surface);
+      border: 1px solid var(--bp-line);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1.1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .bonus-lbl {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--bp-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .bonus-val {
+      font-family: var(--font-mono);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    /* Period Stepper */
+    .stepper-nav {
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .stepper-btn {
+      background: var(--bp-surface);
+      border: 1px solid var(--bp-line);
+      border-radius: var(--radius-sm);
+      color: var(--bp-text-dim);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      padding: 0.55rem 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      white-space: nowrap;
+      transition: all 0.15s ease;
+    }
+
+    .stepper-btn:hover {
+      border-color: var(--cyan);
+      color: #fff;
+    }
+
+    .stepper-btn.active {
+      background: var(--bp-line);
+      border-color: var(--cyan);
+      color: #fff;
+    }
+
+    .stepper-btn .pill {
+      font-size: 0.65rem;
+      padding: 1px 5px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Subjects Grid */
+    .subjects-deck {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .sub-item-card {
+      background: var(--bp-surface);
+      border: 1px solid var(--bp-line);
+      border-radius: var(--radius-sm);
+      padding: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+      transition: all 0.15s ease;
+    }
+
+    .sub-item-card:hover {
+      border-color: var(--cyan);
+    }
+
+    .sub-item-card.done {
+      border-color: var(--green);
+      background: linear-gradient(180deg, var(--bp-surface) 0%, rgba(16, 185, 129, 0.04) 100%);
+    }
+
+    .sub-item-card.locked {
+      opacity: 0.55;
+    }
+
+    .sub-card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .sub-code {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--bp-text-muted);
+    }
+
+    .sub-name {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 0.1rem;
+    }
+
+    .sub-type-badge {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border: 1px solid var(--bp-line);
+      border-radius: var(--radius-sm);
+      text-transform: uppercase;
+    }
+
+    .badge-software { border-color: var(--cyan); color: var(--cyan); }
+    .badge-hardware { border-color: var(--amber); color: var(--amber); }
+    .badge-exatas { border-color: var(--green); color: var(--green); }
+    .badge-humanas { border-color: var(--violet); color: var(--violet); }
+
+    .sub-effect-box {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--bp-text-dim);
+      background: var(--bp-bg);
+      padding: 0.45rem 0.65rem;
+      border-radius: var(--radius-sm);
+      border-left: 2px solid var(--bp-line-bright);
+    }
+
+    .sub-card-footer {
+      margin-top: auto;
+      border-top: 1px dashed var(--bp-line);
+      padding-top: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sub-cost {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--amber);
+    }
+
+    /* ========================================================
+       TAB 3: CATÁLOGO DE CARTAS
+       ======================================================== */
+    .catalog-bar {
+      display: flex;
+      gap: 1rem;
+      background: var(--bp-surface);
+      border: 1px solid var(--bp-line);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      margin-bottom: 1.5rem;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bp-bg);
+      border: 1px solid var(--bp-line);
+      border-radius: var(--radius-sm);
+      padding: 0.4rem 0.75rem;
+      min-width: 260px;
+    }
+
+    .search-box input {
+      background: none;
+      border: none;
+      outline: none;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: #fff;
+      width: 100%;
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 0.35rem;
+    }
+
+    .pill-filter {
+      background: var(--bp-bg);
+      border: 1px solid var(--bp-line);
+      color: var(--bp-text-dim);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+    }
+
+    .pill-filter:hover {
+      color: #fff;
+      border-color: var(--cyan);
+    }
+
+    .pill-filter.active {
+      background: var(--bp-line);
+      border-color: var(--cyan);
+      color: #fff;
+    }
+
+    .catalog-deck {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 1rem;
+    }
+
+    .catalog-card-item {
+      background: var(--bp-surface);
+      border: 1px solid var(--bp-line);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .catalog-card-item:hover {
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    .card-thumb {
+      width: 100%;
+      height: 135px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      background: var(--bp-bg);
+      border: 1px solid var(--bp-line);
+    }
+
+    .catalog-name {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .catalog-desc {
+      font-size: 0.7rem;
+      color: var(--bp-text-dim);
+      line-height: 1.35;
+      height: 2.7em;
+      overflow: hidden;
+    }
+
+    /* Simple Modal */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 10, 19, 0.85);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1.5rem;
+    }
+
+    .modal-backdrop.active { display: flex; }
+
+    .modal-card-box {
+      background: var(--bp-surface);
+      border: 1px solid var(--bp-line-bright);
+      border-radius: var(--radius-md);
+      max-width: 500px;
+      width: 100%;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    .toast-box {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      z-index: 2000;
+    }
+
+    .toast-pill {
+      background: var(--bp-surface);
+      border: 1px solid var(--cyan);
+      padding: 0.55rem 0.9rem;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Blueprint Header -->
+  <header class="bp-header">
+    <div class="header-content">
+      <div class="brand-block">
+        <div class="brand-stamp">ECI // CAD</div>
+        <div class="brand-titles">
+          <h1>PogMoment Blueprint</h1>
+          <p>Mecânicas da Roleta & Fluxograma de Matérias</p>
+        </div>
+      </div>
+
+      <!-- Live Player Indicators -->
+      <div class="status-strip">
+        <div class="status-cell">
+          <span class="cell-lbl">Período</span>
+          <span class="cell-val" id="hud-period">1º Período</span>
+        </div>
+        <div class="status-cell">
+          <span class="cell-lbl">Saldo ECI</span>
+          <span class="cell-val amber" id="hud-points">1.000 🪙</span>
+        </div>
+        <div class="status-cell">
+          <span class="cell-lbl">Pulls Disp.</span>
+          <span class="cell-val" id="hud-pulls">4 / 4 🎫</span>
+        </div>
+        <div class="status-cell">
+          <span class="cell-lbl">Bônus Deploy</span>
+          <span class="cell-val green" id="hud-deploy-mult">+0.0%</span>
+        </div>
+      </div>
+
+      <!-- Quick Action Controls -->
+      <div class="header-actions">
+        <button class="btn-bp primary" onclick="demoAddPoints(1000)">+1.000 ECI</button>
+        <button class="btn-bp" onclick="demoUnlockAll()">⚡ Unlock All</button>
+        <button class="btn-bp" onclick="demoReset()">Reset</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Clean Tabs Bar -->
+  <nav class="bp-tabs-bar">
+    <div class="tabs-inner">
+      <button class="tab-btn active" onclick="switchTab('tab-gacha')">[1] Roleta & Pipeline</button>
+      <button class="tab-btn" onclick="switchTab('tab-subjects')">[2] Grade Curricular (Matérias)</button>
+      <button class="tab-btn" onclick="switchTab('tab-catalog')">[3] Catálogo de Devs (<span id="hud-catalog-count">0</span>)</button>
+    </div>
+  </nav>
+
+  <!-- Main Workstation -->
+  <main class="bp-main">
+
+    <!-- ========================================================
+         TAB 1: ROLETA & PIPELINE (CLEAN & CENTERED)
+         ======================================================== -->
+    <div id="tab-gacha" class="tab-pane active">
+      <div class="gacha-stage-container">
+        
+        <div class="stage-title">
+          <h2>Compilação de Desenvolvedores</h2>
+          <p>Execute um Pull para sortear um Dev e decida entre <strong>Commitar</strong> no Workspace ou <strong>Deployar</strong> em produção por pontos.</p>
+        </div>
+
+        <!-- 3D Specimen Card -->
+        <div class="card-chamber">
+          <div class="chamber-inner" id="card-inner">
+            
+            <!-- Verso (Inicial) -->
+            <div class="card-plane back">
+              <div class="blueprint-logo">ECI</div>
+              <div class="back-tagline">MÓDULO SELADO</div>
+              <div class="back-sub">PRONTO PARA PULL</div>
+            </div>
+
+            <!-- Frente (Revelada) -->
+            <div class="card-plane front" id="card-front">
+              <div class="card-meta-top">
+                <span class="card-code" id="card-id">#000</span>
+                <span class="card-rarity-pill" id="card-rarity">SSR</span>
+              </div>
+
+              <div class="card-img-wrap">
+                <img id="card-img" src="" alt="Dev Card" onerror="handleImageError(this)">
+              </div>
+
+              <div class="card-info-block">
+                <div class="card-title-row">
+                  <span class="card-name" id="card-name">Nome do Dev</span>
+                  <span class="card-type-lbl" id="card-type">Aluno</span>
+                </div>
+                <p class="card-desc-txt" id="card-desc">Descrição acadêmica do módulo.</p>
+
+                <div class="card-bottom-val">
+                  <span style="color: var(--bp-text-muted);">VALOR BASE:</span>
+                  <span style="color: var(--amber); font-weight: 700;" id="card-val">500 ECI</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="controls-strip">
+          <button class="btn-pull-action" id="btn-pull" onclick="executePull()">
+            ▶ PULL / ROLETAR (1 Pull)
+          </button>
+
+          <div class="choices-row" id="choices-row">
+            <button class="btn-choice commit" id="btn-commit" onclick="executeCommit()">
+              <span class="c-title">💾 Commit</span>
+              <span class="c-desc">Salvar no Workspace (-CD Software)</span>
+            </button>
+            <button class="btn-choice deploy" id="btn-deploy" onclick="executeDeploy()">
+              <span class="c-title">🚀 Deploy (<span id="deploy-preview-val" style="color: var(--green);">+0 ECI</span>)</span>
+              <span class="c-desc">Liquidar com Bônus de Exatas</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Clean Shelf of Recent Workspace Cards -->
+        <div class="shelf-container">
+          <div class="shelf-header">
+            <h3>Workspace Recente (<span id="shelf-count">0</span>)</h3>
+          </div>
+          <div class="shelf-deck" id="shelf-deck">
+            <div style="font-size: 0.75rem; color: var(--bp-text-muted); font-family: var(--font-mono);">
+              Nenhum dev commitado no workspace ainda.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================================
+         TAB 2: GRADE CURRICULAR DE MATÉRIAS
+         ======================================================== -->
+    <div id="tab-subjects" class="tab-pane">
+      
+      <!-- Clean Bonus Overview -->
+      <div class="bonus-strip">
+        <div class="bonus-card">
+          <span class="bonus-lbl">Multiplicador Deploy (Exatas)</span>
+          <span class="bonus-val" id="stat-deploy-val">x1.00 (+0%)</span>
+        </div>
+        <div class="bonus-card">
+          <span class="bonus-lbl">Redução Cooldown Commit (Software)</span>
+          <span class="bonus-val" id="stat-commit-cd">-0 min</span>
+        </div>
+        <div class="bonus-card">
+          <span class="bonus-lbl">Redução Cooldown Pull (Hardware)</span>
+          <span class="bonus-val" id="stat-pull-cd">-0 min</span>
+        </div>
+        <div class="bonus-card">
+          <span class="bonus-lbl">Renda Passiva (Humanas)</span>
+          <span class="bonus-val" id="stat-passive-yield">+0 ECI / hora</span>
+        </div>
+      </div>
+
+      <!-- Periods Stepper -->
+      <div class="stepper-nav" id="stepper-nav"></div>
+
+      <!-- Subjects Grid -->
+      <div class="subjects-deck" id="subjects-deck"></div>
+
+    </div>
+
+    <!-- ========================================================
+         TAB 3: CATÁLOGO DE DEVS
+         ======================================================== -->
+    <div id="tab-catalog" class="tab-pane">
+      <div class="catalog-bar">
+        <div class="search-box">
+          <span>🔍</span>
+          <input type="text" id="catalog-search" placeholder="Buscar por ID, nome ou tipo..." oninput="renderCatalog()">
+        </div>
+        <div class="filter-pills">
+          <button class="pill-filter active" onclick="setCatalogFilter('ALL', this)">ALL</button>
+          <button class="pill-filter" onclick="setCatalogFilter('SSR', this)" style="color: var(--amber)">SSR</button>
+          <button class="pill-filter" onclick="setCatalogFilter('SR', this)" style="color: var(--violet)">SR</button>
+          <button class="pill-filter" onclick="setCatalogFilter('R', this)" style="color: var(--cyan)">R</button>
+          <button class="pill-filter" onclick="setCatalogFilter('I', this)" style="color: var(--green)">I</button>
+          <button class="pill-filter" onclick="setCatalogFilter('C', this)" style="color: var(--rarity-c)">C</button>
+        </div>
+      </div>
+
+      <div class="catalog-deck" id="catalog-deck"></div>
+    </div>
+
+  </main>
+
+  <!-- Modal Detalhe de Carta -->
+  <div class="modal-backdrop" id="modal-box" onclick="closeModal(event)">
+    <div class="modal-card-box" onclick="event.stopPropagation()">
+      <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--bp-line); padding-bottom: 0.5rem; margin-bottom: 1rem;">
+        <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--cyan);" id="modal-id">#000</span>
+        <button class="btn-bp" style="padding: 1px 6px;" onclick="closeModal()">&times;</button>
+      </div>
+
+      <div style="display: flex; gap: 1rem;">
+        <img id="modal-img" src="" alt="" style="width: 130px; height: 170px; object-fit: cover; border-radius: var(--radius-sm); border: 1px solid var(--bp-line);" onerror="handleImageError(this)">
+        <div style="display: flex; flex-direction: column; gap: 0.3rem; flex: 1;">
+          <div style="font-family: var(--font-display); font-size: 1.15rem; font-weight: 700; color: #fff;" id="modal-name">Nome</div>
+          <span style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--bp-text-dim); text-transform: uppercase;" id="modal-type">Tipo</span>
+          <p style="font-size: 0.76rem; color: var(--bp-text-dim); margin-top: 0.35rem; line-height: 1.35;" id="modal-desc">Descrição.</p>
+          <div style="margin-top: auto; font-family: var(--font-mono); font-size: 0.85rem; color: var(--amber); font-weight: 700;">
+            Valor Base: <span id="modal-val">0</span> ECI
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.5rem; border-top: 1px solid var(--bp-line); padding-top: 1rem;">
+        <button class="btn-bp" onclick="closeModal()">Fechar</button>
+        <button class="btn-bp primary" onclick="forceRollModalCard()">▶ Demonstrar na Roleta</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-box" id="toast-box"></div>
+
+  <script>
+    const CARDS = [{"id": 1, "name": "Gerson", "type": "profe", "desc": "gerson farmando aura .png", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1512940473206051016/1515086442693398799/86266892-6acb-4e40-a7df-b0e7845c4d9d.png?ex=6a2db9b4&is=6a2c6834&hm=dc57a788da8c0e768f318f45f38ecc9bf1f872e2c1ae18b2830cc2dfd68b2715&=&format=webp&quality=lossless&width=565&height=565"}, {"id": 2, "name": "gerson fim da aula", "type": "profe", "desc": "12:05 num fez chamada ainda vsff", "rarity": "I", "value": 150, "image": "https://i.postimg.cc/tJWKg8WK/0e8e57a4-22da-4359-ab9b-8235291a746c.webp"}, {"id": 3, "name": "Dolg CompSoc", "type": "aluno", "desc": "dolg ultra raro fazendo o trabalho de compsoc. é doulglâs ou douglás??", "rarity": "SSR", "value": 700, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520180114044747896/Whats-App-Video-2026-05-07-at-17-59-11-1_1.gif?ex=6a40418e&is=6a3ef00e&hm=612761491c95b49c4d49335117c7b55bdb96ac3920a840da7e700d17b77bfb0b&=&width=148&height=265"}, {"id": 4, "name": "Palma Lamentável", "type": "profe", "desc": "quando ele faz chamada e vc tá fora de sala", "rarity": "R", "value": 300, "image": "https://i.postimg.cc/L8ycCtTh/0e9b4ab6-3045-425a-a940-3bd654653bba.webp"}, {"id": 5, "name": "Palma Casado", "type": "profe", "desc": "\"façam sexo agora\"", "rarity": "SR", "value": 699, "image": "https://i.postimg.cc/wMQ9wFjN/d8f84478-65f2-469b-a4d2-db8d5c4fa9ef.jpg"}, {"id": 6, "name": "Gerson Feliz", "type": "profe", "desc": "Gerson extremamente raro, apenas aparece das sombras em dias de entrega de prova", "rarity": "SSR", "value": 900, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520144170461696071/Gerson20Zaverucha.png?ex=6a402015&is=6a3ece95&hm=524cf5ca4415ccb066efd026302dd039ce81f4b1f7e848967c841a428baf0bc5&=&format=webp&quality=lossless&width=367&height=400"}, {"id": 7, "name": "Dolg", "type": "aluno", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520211736978788615/534425654_1197604028851658_5879332669734534729_n.png?ex=6a405f02&is=6a3f0d82&hm=0947967dadf29a7ed9c07a4e326f76de1c7e5d76dd36a84414305bba54d77106&=&format=webp&quality=lossless"}, {"id": 8, "name": "Nobre", "type": "aluno", "desc": "adm do server de mine e criador desse bot", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520212081134010498/668525058_1318480770385356_5087501473876267667_n.png?ex=6a405f54&is=6a3f0dd4&hm=d2079521023c06ae67e24ec3fe199001ab88c5c23a36cd73e95269a15ffbbdda&=&format=webp&quality=lossless"}, {"id": 9, "name": "Gabriel Rondônia", "type": "aluno", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520212471321727106/428446792_342637405496527_2800963385628577112_n.png?ex=6a405fb1&is=6a3f0e31&hm=4bec3fd18971e4dfff9778d54fca6b76442be16f429e3a60d9861a591bb1b05f&=&format=webp&quality=lossless"}, {"id": 10, "name": "Guilherme", "type": "aluno", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520211804066676737/491886718_1037499301845489_1781670563366880063_n.png?ex=6a405f12&is=6a3f0d92&hm=61edb84dcf4dba079fa5da0d773864b8a9fed160cc57827848af3df0edea028c&=&format=webp&quality=lossless"}, {"id": 11, "name": "Henricria", "type": "aluno", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520212165817012304/491837241_24149380794695097_1902032960056744860_n.png?ex=6a405f68&is=6a3f0de8&hm=13a384ad6fe125e37fa7fc97c8ce031bd17ee81c2b269d74e2fd9bb2bcf8e14e&=&format=webp&quality=lossless"}, {"id": 12, "name": "Fabi", "type": "aluno", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520212321220300840/669366466_1484741703043568_9026809598955522330_n.png?ex=6a405f8d&is=6a3f0e0d&hm=531bf9306ac380c212bd4cc98bd00b577ccb41a4cdaa516d0857bf8c12f0bd2b&=&format=webp&quality=lossless"}, {"id": 13, "name": "André", "type": "aluno", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520212959631249478/564214734_825293220038663_6652213888537996698_n.png?ex=6a406025&is=6a3f0ea5&hm=00e87a71a13595f19e275333c03e900521a6948c440e4b447834c6914ac8f51c&=&format=webp&quality=lossless"}, {"id": 14, "name": "Ezequiel", "type": "aluno", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520212999271485502/70095359_548396119058071_1443307326930283012_n.png?ex=6a40602f&is=6a3f0eaf&hm=2efe893d43b263ca37078d44fafa2f60afd0278bf219d5e92d395e273e5a5f4b&=&format=webp&quality=lossless"}, {"id": 15, "name": "Diego", "type": "profe", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520213694456270908/Diego20Leonel20Cadette20Dutra.png?ex=6a4060d4&is=6a3f0f54&hm=6df990f0549864760e214063e9c327b2e2d8423588c5318cef085c35a4b5d268&=&format=webp&quality=lossless"}, {"id": 16, "name": "Luiz Arthur", "type": "profe", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520213780586430586/Luiz20Arthur20Silva20de20Faria.png?ex=6a4060e9&is=6a3f0f69&hm=71116c72109b4a6a4da2d24ae899a973801c83b7e46c6db03629c3ace266bb7d&=&format=webp&quality=lossless"}, {"id": 17, "name": "Ratton", "type": "profe", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520213659060797480/Daniel20Ratton20Figueiredo.png?ex=6a4060cc&is=6a3f0f4c&hm=3b32989254f7dbf001c81383ee2df45e6ba718351b8efce33aa11fcb8b2bdbc4&=&format=webp&quality=lossless"}, {"id": 18, "name": "Esperança", "type": "profe", "desc": "ele é foda pena que vai se aposentar :////", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520213847217016893/Claudio20Esperanca.png?ex=6a4060f9&is=6a3f0f79&hm=db6b6f8577c58b2ea930caf49302bbdfa4e8fab2298ac49e36471f00922437d4&=&format=webp&quality=lossless"}, {"id": 19, "name": "Micelli", "type": "profe", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520213910798733523/Claudio20Miceli20de20Farias.png?ex=6a406108&is=6a3f0f88&hm=0692d17b988012884c82da35734502dcaa088923cd95a9f2fa5c909a9674c326&=&format=webp&quality=lossless"}, {"id": 20, "name": "Luidi", "type": "profe", "desc": "trivial", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520215526540841050/Luidi20Gelabert20Simonetti.png?ex=6a406289&is=6a3f1109&hm=11b8fb255bcad27216eba5bd4c6d051f71c2f00db7b40a4444f023ece6d955e3&=&format=webp&quality=lossless"}, {"id": 21, "name": "Zimbrão", "type": "profe", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520215501496778813/Geraldo20Zimbrao20da20Silva.png?ex=6a406283&is=6a3f1103&hm=60d411f652f83403e8ed948b6bb014e500780d01be8b34a9c9028f2821bb1e81&=&format=webp&quality=lossless"}, {"id": 22, "name": "Xexéo", "type": "profe", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520217045923397694/Geraldo20Bonorino20Xexeo.png?ex=6a4063f4&is=6a3f1274&hm=5744283e6c04b4918906595abd00757b53325a8b96b4b7e66784ae6a045b5d1e&=&format=webp&quality=lossless"}, {"id": 23, "name": "Laura", "type": "profe", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520217496307892244/Laura20Silvia20Bahiense20da20Silva20Leite.png?ex=6a40645f&is=6a3f12df&hm=beaa0a75747b19b2536959de5b4071f1d7dd9d63dc1afcadb3d204f0539d0e0b&=&format=webp&quality=lossless"}, {"id": 24, "name": "Luidi Palestrante", "type": "profe", "desc": "o que será que ele tá falando sobre", "rarity": "I", "value": 150, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520218194596462632/luidi_mac80.png?ex=6a406505&is=6a3f1385&hm=afe4377022cd2690be0086d79fa078e5d11ed8ad9acd839beb0ef4736acebd85&=&format=webp&quality=lossless&width=368&height=350"}, {"id": 25, "name": "Ratton Orelhudo", "type": "profe", "desc": "ele escuta tudo", "rarity": "R", "value": 300, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520219120703111251/62a86e3d-f107-4fbc-b904-85b122824296.png?ex=6a4065e2&is=6a3f1462&hm=3786390aa1b657e2f2815d42ce87f34e2ee2e65e939a57d2fff488a96a45aed1&=&format=webp&quality=lossless"}, {"id": 26, "name": "Palma", "type": "profe", "desc": "lamentável", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520219774590648431/s200_sergio_palma_j..medeiros.png?ex=6a40667e&is=6a3f14fe&hm=7f7ad07c11d6ff0af031549e593c940e4ef98b46a748dc2f26dd2561a2640df2&=&format=webp&quality=lossless"}, {"id": 27, "name": "Zé Arthur", "type": "profe", "desc": "média da turma = 2.4", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520220284106309772/1517459109737.png?ex=6a4066f8&is=6a3f1578&hm=2c8a30a110629873c714bcc2f8debdf9517b6b6823121204ced4efd0f54bc484&=&format=webp&quality=lossless"}, {"id": 28, "name": "Guilherme Branco", "type": "aluno", "desc": "fim do racismo", "rarity": "I", "value": 200, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520220616190591220/content.png?ex=6a406747&is=6a3f15c7&hm=7919fa5d653cda3f0fbcc97d03f3a1c6ff2a1802a86aba1ad913b648e012924a&=&format=webp&quality=lossless"}, {"id": 29, "name": "Davi", "type": "aluno", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1520221324486639812/image.png?ex=6a4067f0&is=6a3f1670&hm=20720df684ab9d2fdf987868d3e140f266f155ea1e249c664bc2204bc6d12cc6"}, {"id": 30, "name": "Juan", "type": "aluno", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1520222017897369720/image.png?ex=6a406895&is=6a3f1715&hm=2c05ef8056939eade3a3c047208857d1a3344424f30f361ab0d6eee8c54324b6"}, {"id": 31, "name": "Juan Pai", "type": "aluno", "desc": "papai do ano", "rarity": "I", "value": 169, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1520222300241395914/image.png?ex=6a4068d8&is=6a3f1758&hm=71ba19ed7969ed2ce8e87396abc617198c9d58bef2fea5d2e1d52e7a36fac72b"}, {"id": 32, "name": "Rosa Leão", "type": "profe", "desc": "probest vsff", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520223065903206600/Rosa20Maria20Meri20Leao.png?ex=6a40698f&is=6a3f180f&hm=fe374776a4bec70f04b944a5d5556a53abbf61e317d653dab7302190fcd71731&=&format=webp&quality=lossless"}, {"id": 33, "name": "Vaz", "type": "aluno", "desc": "descricao", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520223826296963153/491869023_676358301806160_8578265042837047263_n.png?ex=6a406a44&is=6a3f18c4&hm=6cccf49e274a31533c78a774aa16ef9137480de0fc0bff990abd261184728fed&=&format=webp&quality=lossless"}, {"id": 34, "name": "Luidi Pai + Mengo", "type": "profe", "desc": "amor pela família e pela seleção", "rarity": "R", "value": 350, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520224540607774810/content.png?ex=6a406aee&is=6a3f196e&hm=eef7e1d731f1e6270398e0278e0f84fd51261be5a61be048614170d33498a8b3&=&format=webp&quality=lossless&width=529&height=350"}, {"id": 35, "name": "Resenillo", "type": "aluno", "desc": "Resenillo, ativar", "rarity": "I", "value": 150, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520227304922550352/content.png?ex=6a406d81&is=6a3f1c01&hm=9cdf17a7383c84438d6fabdf6700a6a7c1a75f8801a50853cd59c8b4ec476e0c&=&format=webp&quality=lossless"}, {"id": 36, "name": "Carlos Pereira", "type": "aluno", "desc": "desc", "rarity": "I", "value": 100, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520228411857965116/637184022_944640014956912_6402065464954027826_n.png?ex=6a406e89&is=6a3f1d09&hm=c235c050996970093401eef1beb5109b7ad759658101a4ac4bd1d41ae5bc72b4&=&format=webp&quality=lossless"}, {"id": 37, "name": "Piquenique do Trisal", "type": "aluno", "desc": "desc", "rarity": "R", "value": 300, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520228125303111760/f025e189-c79b-419e-8486-0565fef85a44.png?ex=6a406e45&is=6a3f1cc5&hm=d43912df6abc4d027fafac8f58f9535f1026c0877de83fa5362656b4a54a27c8&=&format=webp&quality=lossless&width=1181&height=1320"}, {"id": 38, "name": "Gatinhos Jamal", "type": "meme", "desc": "67 67", "rarity": "I", "value": 167, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520543510044872837/ezgif-7865769abe2c94c8.gif?ex=6a4193ff&is=6a40427f&hm=79d9518619c0b6cc6dedea1f9225eb9202c3a5b124b35478e5933202287a09da&="}, {"id": 39, "name": "Cachorrinho na Meia", "type": "meme", "desc": "ele está na meia", "rarity": "I", "value": 180, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1520229865066860614/AP1GczNMlnFOTCc6Z986xJ-Ue4URo5pGmYUnHpb9nNFtAT5nKzidh7m8UVjX6Aw720-h850-s-no.png?ex=6a406fe4&is=6a3f1e64&hm=fc9b9ccb90ea0c7295b2593654186ef76bc15b5bbc594a75a671a31e7728716f"}, {"id": 40, "name": "Seleção ECI", "type": "aluno", "desc": "muita aura", "rarity": "SSR", "value": 800, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520229597570924665/61efa887-372d-498b-88e1-25939e34561f.png?ex=6a406fa4&is=6a3f1e24&hm=eadf168d5529f05ff066e1957e5e84a1e95d077fe3fd5cf54b83af86498129c4&=&format=webp&quality=lossless"}, {"id": 41, "name": "Claude MVP", "type": "meme", "desc": "nois nessa porra em BD", "rarity": "R", "value": 300, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520230138917290085/Untitled.png?ex=6a407025&is=6a3f1ea5&hm=196d84a1a8607bbe25a7c29a5d1eae633762cc9301a4c931e85d1d6d79f067a9&=&format=webp&quality=lossless"}, {"id": 42, "name": "Danilo", "type": "aluno", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1520230790607274214/image.png?ex=6a4070c1&is=6a3f1f41&hm=fb5346af72c3d6a8a33ae788f2023d6221810bbf615343a7301231df84acf37c"}, {"id": 43, "name": "Leopardo Cibernético", "type": "meme", "desc": "anomalia detectada", "rarity": "I", "value": 200, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520231514183307426/WhatsApp_Video_2026-04-17_at_09.20.25.gif?ex=6a40716d&is=6a3f1fed&hm=3c6b5dbb4d08b7202b0acd7f20ca807e470f4db98cd81bc340914688e62a21d0&="}, {"id": 44, "name": "Gerson Fofo", "type": "profe", "desc": "fofíssimo, tá certo?", "rarity": "R", "value": 350, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520231622568316948/AP1GczOlVr4ssQjPSPpt0Zm4kYABDn-VVkfN6sm-sBB_V7yaLq_vA5wt8n734Qw826-h803-s-no.png?ex=6a407187&is=6a3f2007&hm=3a625395b53930f05dc852a35e3066ed82dd16f2effc8d0a52ff863423cdb063&=&format=webp&quality=lossless"}, {"id": 45, "name": "Igor", "type": "aluno", "desc": "descrição", "rarity": "C", "value": 50, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1520235197235200040/534418784_24189384107411951_4882289807444432778_n.png?ex=6a4074db&is=6a3f235b&hm=a98e1540f286f25f9bc3e7b7b8d31a2c8a4f61dfda2dd054508cb50cd7bbb930"}, {"id": 46, "name": "lil igor", "type": "aluno", "desc": "baby igor", "rarity": "I", "value": 150, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1520235473480712363/AP1GczN6RwJU-fvX5TKR58VNB_9iOfVwEFjLNmoKRvV1ezXbPdxftKEpXSqKhAw522-h745-s-no-gm.png?ex=6a40751d&is=6a3f239d&hm=8d68f681caf77f970c961ff37a0f5ab302ec26b704514d59c6f207062f52107c"}, {"id": 47, "name": "Robô Aurudo", "type": "meme", "desc": "direto da apresentação de design thinking", "rarity": "I", "value": 167, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520235486470471830/B9F0CC8B-7AD5-42D7-BBB7-4B70553227DA.png?ex=6a407520&is=6a3f23a0&hm=e8369178a88f7f71528f70bb9625e5f2d919eca6b0b4de2fff2808c5fbcbdf1e&=&format=webp&quality=lossless"}, {"id": 48, "name": "Ingresso BTS", "type": "aluno", "desc": "estreia do integrante do bts 😯", "rarity": "R", "value": 363, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1520235055560261794/AP1GczPHYm2u2154bzRhjODHx2zgVXnQmjPJapQfipgiQxb5CFD_9OXbGdZVPgw557-h745-s-no-gm.png?ex=6a4074b9&is=6a3f2339&hm=76007b965466bac669c9e5b917e2ddb0d978cbf30017d8cd8d93cba01c5cfe59"}, {"id": 49, "name": "Wilson", "type": "aluno", "desc": "desc", "rarity": "SR", "value": 550, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1520236447746101288/AP1GczO8LCKChD_f2Ga8gdMLour8hj0AEH5z4CI1sRzCpIWYo8zm3T6-kzZBpQw733-h745-s-no-gm.png?ex=6a407605&is=6a3f2485&hm=8ea46c7218e07506e47bd2087a607d201cc9577024b3fc7ed00f9c7b6d1f53b7"}, {"id": 50, "name": "Davi 144p", "type": "aluno", "desc": "pobre fudido kkkk", "rarity": "I", "value": 144, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1520236807336235048/AP1GczMFxVlGqeB5Db5lAww6oEEoDNzsshSbr1M36L2ZXeLG1Tz1JPMPiip7PAw413-h549-s-no-gm.png?ex=6a40765b&is=6a3f24db&hm=a8d09f91e60b1e0ff7621f846bbca70503ac6f7bbbbeb6c084249e1d6d335e48"}, {"id": 51, "name": "Brincadeira gostosa", "type": "aluno", "desc": "😏", "rarity": "R", "value": 350, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1520237690304335893/AP1GczP96DK13M71WwlU1cCWY9993CDa3XH2UppTgMe6ZapjO1MveZKb9reLqgw559-h745-s-no-gm.png?ex=6a40772e&is=6a3f25ae&hm=03d709fae87fdfd3b4a26ddd92f3eeedce87ea051a9e8bc59e7da2919ffe1372"}, {"id": 52, "name": "Gu1m3x", "type": "aluno", "desc": "igualzinho", "rarity": "I", "value": 125, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1520239332428877964/image.png?ex=6a4078b5&is=6a3f2735&hm=5e822de24ddf129927aeb53f96846985004d7e86e0f520f665fbb6473f1cc3db"}, {"id": 53, "name": "GuiResenha", "type": "aluno", "desc": "guilherme resenhudo dms slk", "rarity": "I", "value": 150, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520242060580622456/image.png?ex=6a407b3f&is=6a3f29bf&hm=0ff63b4bf00c2e847064b13aa619bfbddf263217fd1f70337b158979647d6733&=&format=webp&quality=lossless"}, {"id": 54, "name": "Julio ZZZZZZZ", "type": "aluno", "desc": "só dorme esse baiano", "rarity": "I", "value": 199, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520240180613611681/image.png?ex=6a40797f&is=6a3f27ff&hm=fb3d7a344c595667b774ab6c5f58aa55dab56db68aa5e337084236a3327950ff&=&format=webp&quality=lossless"}, {"id": 55, "name": "Scrum Masters", "type": "aluno", "desc": "piquenique e resenha", "rarity": "SR", "value": 699, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520260398975160410/IMG_1896.jpg?ex=6a408c54&is=6a3f3ad4&hm=6e527acefbc5439a03892ec105b2b6f0c0f978b0a499ea65258b0353a1648e0b&=&format=webp&width=1621&height=1216"}, {"id": 56, "name": "Dolg China", "type": "aluno", "desc": "199+ social credits", "rarity": "I", "value": 199, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1520441432173842604/image.png?ex=6a4134ed&is=6a3fe36d&hm=8b4a2fb8e1822ae87d649da485216a6fd55673ec242f1db15967927780798d53"}, {"id": 57, "name": "Prisão Kamicaz", "type": "aluno", "desc": "pelo crime de matar o Ghastly", "rarity": "I", "value": 167, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520493561970294794/Untitled.png?ex=6a41657a&is=6a4013fa&hm=f601b01c1d917bce89ba0462f9a4d2bda392c81b58cee143b1a1ec80636e48c6&=&format=webp&quality=lossless"}, {"id": 58, "name": "Minezin ECI", "type": "meme", "desc": "é mt resenha slk", "rarity": "C", "value": 99, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520494175328534588/BE31CE54-461C-4D0F-9131-ACCA80EF840B.png?ex=6a41660c&is=6a40148c&hm=d28601875c2f4c13790d01af75f37d01c224b8d551fa0acd0a7b096517922d06&=&format=webp&quality=lossless"}, {"id": 59, "name": "Fábrica de Bolos", "type": "meme", "desc": "fabrica de bolos do mine feita pelo presida", "rarity": "R", "value": 367, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520495688167719022/CACC1E9E-C23C-42EC-BCF2-3F34B70A21A1.png?ex=6a416775&is=6a4015f5&hm=2ac4fed15ecb5d35c2db6f75457c45c062bd07e5561ccf62329c5ce68efd065d&=&format=webp&quality=lossless"}, {"id": 60, "name": "Senzala do Henricria", "type": "meme", "desc": "estranhamente parecida com a H324-B, pura coincidência", "rarity": "SR", "value": 550, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520495481187209338/CB3F7E50-38E6-4A76-9070-9335128C4E26.png?ex=6a416744&is=6a4015c4&hm=f58030e6dfaf0bc3971aeddf8d8f71d87fa3fa310b0ee3b6548a2b1f141d9503&=&format=webp&quality=lossless&width=2162&height=1216"}, {"id": 61, "name": "GuiHu", "type": "aluno", "desc": "anotações que salvam gerações", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520583767704469665/Foto.jpg?ex=6a41b97d&is=6a4067fd&hm=f0c9f24696f1e58702509542a77765f487e4befd03ec8de6e3119755a7e769ab&=&format=webp&width=1180&height=1320"}, {"id": 62, "name": "Pedro", "type": "profe", "desc": "ele com cabelo é cursed dms", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520243275011985529/avatar.png?ex=6a412521&is=6a3fd3a1&hm=6d03c178f3d4d9f7c84ce453e60669d246dbb1574ba4b170639a8d45e15d169d&=&format=webp&quality=lossless"}, {"id": 63, "name": "Luís Kosmalski", "type": "profe", "desc": "fã número 1 do Kurose", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520587578267664514/Luis-Henrique-Maciel-Kosmalski-Costa.png?ex=6a41bd09&is=6a406b89&hm=0256236fab2eb875cecb2e3617602a875f20169ecfd6f8d47983dd767acfb543&=&format=webp&quality=lossless"}, {"id": 64, "name": "Rodrigo Couto", "type": "profe", "desc": "top aulas neurodivergentes", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520589731363033149/Untitled.png?ex=6a41bf0b&is=6a406d8b&hm=7030e811b6183449bcf99cf348006fe1962df2b632ed1a0b05b8a632549094ed&=&format=webp&quality=lossless"}, {"id": 65, "name": "GuiHu Anjo", "type": "aluno", "desc": "me passou em logmat", "rarity": "SSR", "value": 777, "image": "https://media.discordapp.net/attachments/1507589732136390716/1520589805799604404/content.png?ex=6a41bf1c&is=6a406d9c&hm=1db6b4ba552ba6f5c4c5e8b6de0e9d82ed06712dd38db598bb58e410d5ea356b&=&format=webp&quality=lossless&width=1181&height=1320"}, {"id": 66, "name": "Patrocinadores do CHESS", "type": "meme", "desc": "eles tornaram tudo possível", "rarity": "SR", "value": 550, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520591293686878320/76BE6C14-202A-4BF4-9465-DEEA71E96170.png?ex=6a41c07f&is=6a406eff&hm=a684c4a6435b85cbeb62b0deb69bdd5bef66d51d635d3dd3bc11439f679bd6e0&=&format=webp&quality=lossless"}, {"id": 67, "name": "Salinha", "type": "meme", "desc": "resenhou", "rarity": "R", "value": 499, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520590277222596700/IMG_8378.jpg?ex=6a41bf8d&is=6a406e0d&hm=9c964bd5bd5a506270f655ae62780eb42210fded7e57160e2a7194203abee1ac&=&format=webp&width=1621&height=1216"}, {"id": 68, "name": "Espindola", "type": "profe", "desc": "Pesquisa aí: \"Pinto\"", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520592179834126488/image0.jpg?ex=6a41c152&is=6a406fd2&hm=d33dc232af379ab886d00e89c92a05540229c24340f6ae3ef3ad134ee7c97e37&=&format=webp"}, {"id": 69, "name": "Tutu", "type": "meme", "desc": "agradeça imediatamente", "rarity": "SSR", "value": 800, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520591965534556200/image0.jpg?ex=6a41c11f&is=6a406f9f&hm=4d321d5b44009734a7bf31d250a397e95585cc3f412eaf452b9b30f5f6446e37&=&format=webp"}, {"id": 70, "name": "Esperança Cinema", "type": "profe", "desc": "o criador do cinema", "rarity": "R", "value": 360, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520592349015838853/image0.jpg?ex=6a41c17b&is=6a406ffb&hm=0aa9c5843c6a05f34178850e2f8c9f71659afa095781bc98107e045647608655&=&format=webp"}, {"id": 71, "name": "Campeonato de Xadrez", "type": "meme", "desc": "é o chess", "rarity": "SR", "value": 600, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520591953778053180/image.png?ex=6a41c11d&is=6a406f9d&hm=87c509a8294deca4cd30a58b5b0adc5471598b00d63a42d2ce90a1622bc1d288&=&format=webp&quality=lossless&width=1274&height=1320"}, {"id": 72, "name": "Flávio Mello", "type": "profe", "desc": "desc", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520593936362504332/2809bcff-ca1b-4cb4-80c5-0abf5e1c881c.png?ex=6a41c2f5&is=6a407175&hm=348728e1ae306c1e49bd27189038920a3ea08235005eebf8d8239669de8f9e67&=&format=webp&quality=lossless"}, {"id": 73, "name": "GuiHu Infernal", "type": "aluno", "desc": "do universo paralelo em que o GuiHu não compartilha anotações", "rarity": "SR", "value": 666, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520866866892112043/Untitled.png?ex=6a42c125&is=6a416fa5&hm=20a5f5060dce5be63d492359438e0bec9f3722342bf2883ad0eefccc62288a99&=&format=webp&quality=lossless&width=1196&height=1320"}, {"id": 74, "name": "Rondônia", "type": "aluno", "desc": "Rondônia em Rondônia tlgd", "rarity": "R", "value": 450, "image": "https://media.discordapp.net/attachments/1512940473206051016/1520871089780031619/Untitled.png?ex=6a42c514&is=6a417394&hm=a0019dac9bdb0cb0ac40904af8ce814fdd1ddea19f4e8a31763dafa149e1736c&=&format=webp&quality=lossless"}, {"id": 75, "name": "NIKAO", "type": "aluno", "desc": "dj", "rarity": "C", "value": 50, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520871448233906447/491868811_1850156022490528_3127055953475950337_n.png?ex=6a42c569&is=6a4173e9&hm=e6eac6e63dc6829efb962616a869c67393557cd435e0b3fd1879428a539e2f12"}, {"id": 76, "name": "Dudu", "type": "aluno", "desc": "genio", "rarity": "C", "value": 51, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520873948621963334/676976072_1686968942435385_1675717057979129680_n.png?ex=6a42c7bd&is=6a41763d&hm=48be70a7d6d56672652d2529a974b3f2e9ce42d2f9110f9888f04807b142a150"}, {"id": 77, "name": "Juan Ensina Gerson", "type": "aluno", "desc": "farmou aura", "rarity": "R", "value": 400, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520870387343294514/IMG-20260609-WA0256.jpg?ex=6a42c46c&is=6a4172ec&hm=f2ddaea6d3b0e0ee4ec035698372c8df50a5cdff8779e9f93a5e64bcf9ca2f2c&"}, {"id": 78, "name": "Dolg Habbo", "type": "aluno", "desc": "desc", "rarity": "I", "value": 160, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520870387683168449/IMG-20260505-WA0334.jpg?ex=6a42c46c&is=6a4172ec&hm=2167ce048c71828e4e62609844fd05af747f080928eafff1801b64f25eb71116&"}, {"id": 79, "name": "Guimex Habbo", "type": "aluno", "desc": "desc", "rarity": "I", "value": 160, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520870388081492108/IMG-20260505-WA0335.jpg?ex=6a42c46c&is=6a4172ec&hm=bccdfcaeeab6c1ffc88a9137ccd6cee797f7787a405f4f4a3549027220c77520&"}, {"id": 80, "name": "Danilada Gamer", "type": "aluno", "desc": "esquece", "rarity": "R", "value": 320, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520963893252456458/image.png?ex=6a431b82&is=6a41ca02&hm=09756fa5ecd5e5c2566599d30c3f4212c615b80fdeffe37121b2187e43dabc6c"}, {"id": 81, "name": "Julia", "type": "aluno", "desc": "desc", "rarity": "C", "value": 50, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520964493104910496/418951196_589264353387883_5499677208741348940_n.png?ex=6a431c11&is=6a41ca91&hm=30ee443a0a6b73f05d6f1bcf9116fc341648c00f010bf90dd7ecc0a59ddcabac&"}, {"id": 82, "name": "Karine", "type": "aluno", "desc": "desc", "rarity": "C", "value": 50, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520964493642043502/660732212_2254363731767346_5928643822578156271_n.png?ex=6a431c11&is=6a41ca91&hm=5ff275718f3b3366a8aea0ad0528ee050da78ecc395040f6cd2053d0b1573971&"}, {"id": 83, "name": "Marco", "type": "aluno", "desc": "desc", "rarity": "C", "value": 50, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520964494040367224/436944594_1862713184194809_892092388521759740_n.png?ex=6a431c11&is=6a41ca91&hm=1dbdf4445b84f5817ba9314894242f8b1ab9e53708d98adbc97b2982c514e3e8&"}, {"id": 84, "name": "João", "type": "aluno", "desc": "desc", "rarity": "C", "value": 50, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520964494669647952/328165634_1714838549361694_2790343431389861057_n.png?ex=6a431c11&is=6a41ca91&hm=88792658c7d8b04d280f3a8101d3be000983d675d1d399efb0c0d50a21b18b2e&"}, {"id": 85, "name": "Yuri", "type": "aluno", "desc": "desc", "rarity": "C", "value": 50, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520964495277555802/445129633_1586928231871391_3011405150036861619_n.png?ex=6a431c11&is=6a41ca91&hm=e0715a4d3d8eb9aa46aa6bbfee827ec9878926b81d99b0f4b02b19f4864d2dbe&"}, {"id": 86, "name": "Gabriel Rezende", "type": "aluno", "desc": "desc", "rarity": "C", "value": 50, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520965043406114886/569389439_824776176590305_4432181464705700014_n.png?ex=6a431c94&is=6a41cb14&hm=0d6ea56d24f4a4effb4f686fd9ff3e394f9b4d48ac07394e164b3692c59dc17b"}, {"id": 87, "name": "Dolg com L.", "type": "meme", "desc": "moggada maxima no presida", "rarity": "SR", "value": 500, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520966300170584134/image.png?ex=6a431dc0&is=6a41cc40&hm=e3595c02d1c8a709f70c1e8ef4c98681d63fd48bc8ce144720b6eb504921db62"}, {"id": 88, "name": "Juan Trans", "type": "aluno", "desc": "tens o necessario para esmagares minha rata?", "rarity": "R", "value": 300, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520970492306259978/image.png?ex=6a4321a7&is=6a41d027&hm=8f04c8f63cba994fe9914fc530e1168c443b41d07fd351fbc766aec5d2f78f47"}, {"id": 89, "name": "Assombração", "type": "aluno", "desc": "Alguem conhece este ser", "rarity": "R", "value": 300, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520971185138040853/content.png?ex=6a43224c&is=6a41d0cc&hm=5076466992def015953e3896be9c3313aa979470743288345b55320ba727cfab"}, {"id": 90, "name": "Fabi Niver", "type": "aluno", "desc": "feliz 67 anos 🥳", "rarity": "I", "value": 150, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520973837876072488/image.png?ex=6a4324c5&is=6a41d345&hm=fce92ee844c0315078ea935437e78a20358917a32ae9fcfc8f82d4f60b670a26"}, {"id": 91, "name": "Gui zerou", "type": "aluno", "desc": "sem comentarios", "rarity": "I", "value": 150, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1520976190905782352/image.png?ex=6a4326f6&is=6a41d576&hm=b7981ea38489f7ca588f5897e65639f3c5fe558a62bb0d94c48d574a4879573c"}, {"id": 92, "name": "Guilherme Convocado", "type": "aluno", "desc": "Agora o Hexa vem 🔥", "rarity": "I", "value": 199, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1521248684925518026/image.png?ex=6a4424bd&is=6a42d33d&hm=36397e59256f963f04e9ada962eb23dc5f835cf58b76555af64c2da6d81f3bf9"}, {"id": 93, "name": "Carol", "type": "aluno", "desc": "desc", "rarity": "C", "value": 50, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1521639521991790702/image.png?ex=6a4590bc&is=6a443f3c&hm=7c5d7de388818c09c5a8bf47ee240486de65642a6ad4de01e7ceb085adfc50cb"}, {"id": 94, "name": "Sequestro da Intrusa", "type": "aluno", "desc": "Uma intrusa sendo sequestrado na mala de uma fiat", "rarity": "I", "value": 150, "image": "https://cdn.discordapp.com/attachments/1507550288926474311/1521639350259945714/image.png?ex=6a459093&is=6a443f13&hm=a396723557b85641506bd09f565a54768cd54735ba8b98fd69867537ed76025b"}, {"id": 95, "name": "Luis Arthur Apertado", "type": "profe", "desc": "Luis Arthur quando está apertado.", "rarity": "R", "value": 300, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1521652095722328104/image.png?ex=6a459c72&is=6a444af2&hm=088b1bf064fa3ba83adf3ad20901a942ed5c6c4b53e31576f002408f6316f020"}, {"id": 96, "name": "Carlos Pereira Aura Maxxing", "type": "aluno", "desc": "by fabisa", "rarity": "SR", "value": 667, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1521707727464829008/image.png?ex=6a45d042&is=6a447ec2&hm=28d364fd089a0b8cdf72c6e22946d84b510ff5c2ed58bb878319a3a4c31a2ca3"}, {"id": 97, "name": "Gerson óculos quebrado", "type": "profe", "desc": "ficou puto que o mlk n sabia skolemizar", "rarity": "R", "value": 400, "image": "https://media.discordapp.net/attachments/1512940473206051016/1522414184376041532/Untitled.png?ex=6a486232&is=6a4710b2&hm=639d62370ccb6c93eee4b81fdb7cabfbc41f71b76451b53ece6f85ad5c5debf5&=&format=webp&quality=lossless"}, {"id": 98, "name": "cagão da noite", "type": "aluno", "desc": "21:40 e o maluco no fundão cagando", "rarity": "I", "value": 111, "image": "https://media.discordapp.net/attachments/1512940473206051016/1522414777349963877/Untitled.png?ex=6a4862c0&is=6a471140&hm=bc1e1053fe2f7097ae92e7940163a57b14a5c515f0b8021f170b080d9db01bda&=&format=webp&quality=lossless"}, {"id": 99, "name": "Danilo neneca", "type": "aluno", "desc": "😴", "rarity": "R", "value": 350, "image": "https://i.ibb.co/kVcNjV3g/Whats-App-Video-2026-07-04-at-17-10-21-1-1.gif"}, {"id": 100, "name": "Dolg neneca", "type": "aluno", "desc": "marola", "rarity": "R", "value": 350, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1523119384569315460/WhatsApp_Video_2026-07-04_at_17.10.21.gif?ex=6a4af2f7&is=6a49a177&hm=7ffd0c14fbc143fc6de76b022e2c425ab169157356bdb30d5bd39cf17336f566"}, {"id": 101, "name": "Henrique neneca", "type": "aluno", "desc": "aulinha de log mat", "rarity": "R", "value": 350, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1523120318967713802/2330803d-3a0b-494d-bdbf-d0b1af0afd90.png?ex=6a4af3d6&is=6a49a256&hm=e819508fe20fe3e0c026a7f19f3f6445a74db2cb5adcc34f6066db181d7e0922"}, {"id": 102, "name": "SELECT FOR UPDATE", "type": "meme", "desc": "nem caiu essa bosta no final e ele disse que ia fdp", "rarity": "I", "value": 101, "image": "https://media.discordapp.net/attachments/1512940473206051016/1523855553409978548/039F9F4A-8A63-4360-AB19-D7F89652B092.png?ex=6a4da093&is=6a4c4f13&hm=0fad6069bfcf9cfc85d23878c36b2affe781f498b172204cbae26e7e713ee614&=&format=webp&quality=lossless"}, {"id": 103, "name": "Lamentável", "type": "profe", "desc": "menti que tava na aula e tomei lamentável F", "rarity": "I", "value": 167, "image": "https://media.discordapp.net/attachments/1512940473206051016/1523856222284021770/C3405CB6-83D4-401E-BED4-A2FD521596D7.png?ex=6a4da133&is=6a4c4fb3&hm=5ca5b51372bd10234863215680fb84b5a79e8df0b163cc1cd835179e95a16a1e&=&format=webp&quality=lossless"}, {"id": 104, "name": "Periodo 24.1", "type": "aluno", "desc": "só os cria", "rarity": "SR", "value": 600, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1524143107799519232/0357c337-c0ae-4f7d-b955-7ac8c9a9db61.png?ex=6a4eac62&is=6a4d5ae2&hm=add8174a44171729b77983fe4123711d21221cea2c9a1c67847bc4ddfbeb987a"}, {"id": 105, "name": "Juan loló", "type": "aluno", "desc": "doidao de loló", "rarity": "R", "value": 300, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1524143340550099177/153414f7-1000-4a24-841f-0066f241d952.png?ex=6a4eac99&is=6a4d5b19&hm=4ed95092f43137619016513be46eb01a5c67de4cd65adbce8ceeffee17e14ed0"}, {"id": 106, "name": "Juan neneca + pai", "type": "aluno", "desc": "papai do ano mesmo ntj", "rarity": "R", "value": 450, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1524144640805044494/61316ff3-a2f8-4fbb-b1ba-29f54efb700d.png?ex=6a4eadcf&is=6a4d5c4f&hm=8cfc889898a459de64da5c7002c29543e09d114915f77e25ea22b169c2693944"}, {"id": 107, "name": "Caranguejo da EBA", "type": "meme", "desc": "como ele chegou ai?", "rarity": "I", "value": 160, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1524144558206881832/83811707-ea8b-4018-b607-2b06f55479ff.png?ex=6a4eadbb&is=6a4d5c3b&hm=68dcbadd62051833cd8e8fda64321b51b3fcb6478df33af33f8fda9a73fd11e2"}, {"id": 108, "name": "presida spotted", "type": "aluno", "desc": "ta requisitado ele", "rarity": "I", "value": 199, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1524144794454982858/image.png?ex=6a4eadf4&is=6a4d5c74&hm=0536432e5485e181ea04ee573e40340535683a27a2430492949864ee36502eca"}, {"id": 109, "name": "churrasqueiros do wilson", "type": "aluno", "desc": "esses adoram uma linguiça", "rarity": "R", "value": 350, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1524145135787446282/630a0403-1bd8-4fd1-b1f8-7034a3d8b124.png?ex=6a4eae45&is=6a4d5cc5&hm=13ecf5971821bd09802a82dc3ada67484b99a64a824d281307ddd56149ee3926"}, {"id": 110, "name": "=Eduardo", "type": "meme", "desc": "Quem que é Eduardo mano", "rarity": "I", "value": 150, "image": "https://media.discordapp.net/attachments/1512940473206051016/1524555945601138840/17624823-483A-44A9-98FA-5C1C655081A7.png?ex=6a502cde&is=6a4edb5e&hm=a604da56f6285758f21eb6cdd69fce296cb7c2021d09ac18a72d0983abbd1ef2&=&format=webp&quality=lossless"}, {"id": 111, "name": "IM", "type": "profe", "desc": "desc", "rarity": "C", "value": 1, "image": "https://media.discordapp.net/attachments/1512940473206051016/1524945232091942993/im.png?ex=6a51976b&is=6a5045eb&hm=fa389553bdbbab63e8e50d85fcb9243ed8794fedc2df5b188df200e13ced1960&=&format=webp&quality=lossless"}, {"id": 112, "name": "IF", "type": "profe", "desc": "morte IF", "rarity": "C", "value": 1, "image": "https://media.discordapp.net/attachments/1512940473206051016/1524945059722559758/AIdro_lVxhvbilxPKYhqIq1_84g14T_Y8BPb8Cr-DuUNwentKrks900-c-k-c0x00ffffff-no-rj.png?ex=6a519742&is=6a5045c2&hm=9aea178f0ebdad4690ebb4ec8b3ecf098500c0d70c14a9e6913173d56fb955a0&=&format=webp&quality=lossless"}, {"id": 113, "name": "GTA", "type": "profe", "desc": "profes legais alguns", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1512940473206051016/1524945369249743019/AIdro_mP9xAZHQ8zMCmSXN9-veB8m6RQeR0GtDXI-QmuX61-Ggs900-c-k-c0x00ffffff-no-rj.png?ex=6a51978c&is=6a50460c&hm=38a7221eb36b9d800fd1d2edcf31773b8e86db9705458a19938e497fc6fb2238&=&format=webp&quality=lossless"}, {"id": 114, "name": "PESC", "type": "profe", "desc": "NÓS AMAMOS O PESC OBRIGADO PESC", "rarity": "SR", "value": 550, "image": "https://media.discordapp.net/attachments/1512940473206051016/1524945851548565614/AIdro_k1fzjCX5AirPFaGXv2ZKm_x8fAEXDngQh7igGp_9NIwAs900-c-k-c0x00ffffff-no-rj.png?ex=6a5197ff&is=6a50467f&hm=35bd149cdce3e2b6b9b1fd32b2a3dd68f99d89e4e150c31ef2f0220b2b2d28ac&=&format=webp&quality=lossless"}, {"id": 115, "name": "POLI", "type": "profe", "desc": "meh", "rarity": "C", "value": 3, "image": "https://media.discordapp.net/attachments/1512940473206051016/1524946485031211028/ZkWCLhzWg7eNHTQK0tdCZKhudVMEFVWQcRd6KfVLUJOPQnspU5jfK4ZVR9iq-Ty6dOsFBx7Ezws900-c-k-c0x00ffffff-no-rj.png?ex=6a519896&is=6a504716&hm=4cd413cfff9c0d8c4e9d9e9c51f95e7b2c547086be30b9a111449ffced9e96f6&=&format=webp&quality=lossless"}, {"id": 116, "name": "Mural do Bloco H", "type": "profe", "desc": "um dos murais de todos os tempos", "rarity": "C", "value": 40, "image": "https://media.discordapp.net/attachments/1512940473206051016/1524946690358902915/images.png?ex=6a5198c7&is=6a504747&hm=59f1fbbf1aed49aea8389b5b125f9817b7294dfbd58bb3a0af536e73f33dabfd&=&format=webp&quality=lossless"}, {"id": 117, "name": "CT", "type": "profe", "desc": "Não é tão tecnológico quanto o nome leva a crer", "rarity": "C", "value": 30, "image": "https://media.discordapp.net/attachments/1512940473206051016/1524947014062706719/ufrj.png?ex=6a519914&is=6a504794&hm=a5b1bc7ee1500202b669013d132405e9ea852b56ea33a4f6896e5a584679cf8f&=&format=webp&quality=lossless"}, {"id": 118, "name": "Incendiou", "type": "meme", "desc": "quem lembra", "rarity": "I", "value": 100, "image": "https://media.discordapp.net/attachments/1512940473206051016/1524948292494950490/whatsapp-image-2023-04-05-at-09.41.00.png?ex=6a519a45&is=6a5048c5&hm=3dc14afb8db6ea7fdf82e5c81535a8a1c59edb6dc68b901751a6ae725a4e2668&=&format=webp&quality=lossless"}, {"id": 119, "name": "Pousou", "type": "meme", "desc": "helicopter helicopter", "rarity": "I", "value": 167, "image": "https://media.discordapp.net/attachments/1507589732136390716/1524950040769200249/ezgif-86c7dd99a8ac9ad2.gif?ex=6a519be5&is=6a504a65&hm=40bba38fad106ec9e133547580b6ec7f9a31cc0c5e6bda353d7a962593b95998&="}, {"id": 120, "name": "Nutryenerge", "type": "meme", "desc": "se eu pudesse colocar pontos negativos eu botava", "rarity": "C", "value": 1, "image": "https://media.discordapp.net/attachments/1512940473206051016/1524950666139926548/41356FB3-BE45-4DAF-A278-71C8A727A2FF.png?ex=6a519c7b&is=6a504afb&hm=ee07c1ec72b9c9218eabf888cb085bc0221aea95418a59e123159b4e9afd25e8&=&format=webp&quality=lossless"}, {"id": 121, "name": "Davi banana", "type": "meme", "desc": "bananudo", "rarity": "I", "value": 150, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1525939407851622632/file_00000000ea78720e8bc631478c8e5c2d.png?ex=6a553551&is=6a53e3d1&hm=a20a8cc3efbb4f7f087baf5646c829e1458d305758b06590685bb9177dc9372c&"}, {"id": 122, "name": "Igor abacaxi", "type": "meme", "desc": "abacaxudo", "rarity": "I", "value": 150, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1525940203389452318/file_000000000c84720e9a41f8fd18d7f022.png?ex=6a55360f&is=6a53e48f&hm=63eb6eacacf0bef0dfe29f9e47028e88054dbd3a6efb43bf727cfe91b9486561&"}, {"id": 123, "name": "Guilherme Pimenta", "type": "meme", "desc": "pimentudo", "rarity": "I", "value": 150, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1526321630157078548/content.png?ex=6a56994a&is=6a5547ca&hm=cd2352d1323c141c593abafa21446545afc71543c3ae75d00bf7c516a9171345"}, {"id": 124, "name": "Dolg brócolis", "type": "meme", "desc": "brocolhudo", "rarity": "I", "value": 150, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1526350962007216258/ChatGPT_Image_13_de_jul._de_2026_19_08_38.png?ex=6a56b49b&is=6a55631b&hm=dcdfcf9f29acd982702693874371590482ca7035a01265d2887171653908f7a6"}, {"id": 125, "name": "Fabi Engsoc", "type": "aluno", "desc": "porra de engsoc", "rarity": "I", "value": 180, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1526641746149113906/image.png?ex=6a57c36b&is=6a5671eb&hm=0264ab5b43aa83e80de1bd22a9a3775a0607e83b506134b498158eb246713319"}, {"id": 126, "name": "Guimex Cabeludo", "type": "aluno", "desc": "cabelo pa carai", "rarity": "I", "value": 180, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1526649898676650054/image0.jpg?ex=6a57cb03&is=6a567983&hm=42b01e8752d042378e654f163c05e3ed5b8d79cd3dddd665e53a18d8f8288716"}, {"id": 127, "name": "Fabi alface", "type": "aluno", "desc": "alfaçuda", "rarity": "I", "value": 150, "image": "https://cdn.discordapp.com/attachments/1507589732136390716/1527444348055060590/content.png?ex=6a5aaee7&is=6a595d67&hm=543146ecdc82a8748e7ae4d97134cef16f7ad890efa6e6eee94cd11bca35be3f"}, {"id": 128, "name": "phasmoWilson", "type": "aluno", "desc": "inserir link", "rarity": "SR", "value": 567, "image": "https://media.discordapp.net/attachments/1507533436171063408/1525277674195652669/image.png?ex=6a5f5347&is=6a5e01c7&hm=f1b1d8e4ed42649e6747ef3b68fb71c62d8168320b1cbb1be5154d96c9903838&=&format=webp&quality=lossless"}, {"id": 129, "name": "Carol Morango", "type": "aluno", "desc": "moranguda", "rarity": "I", "value": 150, "image": "https://media.discordapp.net/attachments/1512940473206051016/1527716154016141607/AAQ_wbGY4t7CSggKN6F4w54OcOJUUhu0xidmbRu-b_4SuQV6R2N9qxKqSVCu0X_yG9YsKNhe67lg1ROd3Qe_B7a84utCAr2HUJoiYJloy5r8Tyf38WF30fFyHt6n7YFHeK8fFOnr9-J11OALu8x-oyvN9OErooTtv72BPb4AlJe2IN6RAdicDAs1024-rj.png?ex=6a5fa08a&is=6a5e4f0a&hm=0efec9e0181e6fcd00385f23f6dc98bc0c3ca6036ce35bcb77c047ecd228fdc8&=&format=webp&quality=lossless&width=896&height=894"}, {"id": 130, "name": "roblox gaming", "type": "meme", "desc": "adivinhe o autismo ou morra", "rarity": "R", "value": 300, "image": "https://media.discordapp.net/attachments/1512940473206051016/1529280883398541494/Untitled.png?ex=6a615d4f&is=6a600bcf&hm=c09bdee59586fee55def81ae3bfdf34db5456ba6c09a98f678edbe5c5a9b97e5&=&format=webp&quality=lossless"}, {"id": 131, "name": "Lui D. Simonetti", "type": "profe", "desc": "banido em 5 países", "rarity": "SR", "value": 550, "image": "https://media.discordapp.net/attachments/1512940473206051016/1529903034019217499/Untitled.png?ex=6a63a0bb&is=6a624f3b&hm=c9456a3bd800adfeb7dce11d90d28b71b3e0bf03e12837f204ea66d499e5bb63&=&format=webp&quality=lossless"}, {"id": 132, "name": "Luidi Neneca?", "type": "profe", "desc": "ou talvez ele estivesse meditando sla", "rarity": "R", "value": 300, "image": "https://media.discordapp.net/attachments/1512940473206051016/1529903589336547458/Untitled.png?ex=6a63a13f&is=6a624fbf&hm=b12ffc6129c562a64935743a2a55011e0e5df438d1b8acc816a1db94edb3473f&=&format=webp&quality=lossless"}, {"id": 133, "name": "Palma Biólogo", "type": "profe", "desc": "proibido dar a matéria", "rarity": "R", "value": 399, "image": "https://media.discordapp.net/attachments/1512940473206051016/1529903945995259914/Untitled.png?ex=6a63a194&is=6a625014&hm=8a09d3b83667fe98ac7248cf3c704dad2d94d4f1b581bff222ccb3daa7286480&=&format=webp&quality=lossless"}, {"id": 134, "name": "Luidi Transcendental", "type": "profe", "desc": "transcendeu a própria matéria que ele dá", "rarity": "SSR", "value": 950, "image": "https://media.discordapp.net/attachments/1512940473206051016/1529904765083975750/Untitled.png?ex=6a63a258&is=6a6250d8&hm=cdde57eec4fe1e18d070e90c62ff189b7ddd90186f2c0bf1e7412ddf57b41de7&=&format=webp&quality=lossless"}, {"id": 135, "name": "Guihub", "type": "aluno", "desc": "sem ele só me formava em 10 períodos", "rarity": "R", "value": 350, "image": "https://media.discordapp.net/attachments/1512940473206051016/1529867365595217941/image0.jpg?ex=6a637f83&is=6a622e03&hm=d5ea772b3d68ba1f38787e6960adb21ed0d8821288cb04016deca20beb92a835&=&format=webp&width=1320&height=1320"}, {"id": 136, "name": "Dolg SIGA", "type": "aluno", "desc": "top 5 fotos do siga", "rarity": "C", "value": 70, "image": "https://media.discordapp.net/attachments/1512940473206051016/1530051580169031700/image.png?ex=6a642b13&is=6a62d993&hm=c9efb14f90235f5bb4f9f4fb8d7615c5ad2d85b774053d9baa84a3db821e7a91&=&format=webp&quality=lossless"}, {"id": 137, "name": "Nobre SIGA", "type": "aluno", "desc": "skin padrao", "rarity": "C", "value": 70, "image": "https://media.discordapp.net/attachments/1512940473206051016/1530052509555757086/CB5EBD05-0C34-4833-B8B9-107CC12A0CAB.png?ex=6a642bf1&is=6a62da71&hm=ad5254b4199e4b9ed622de1840dbe1f67ec5bb4c5410342112ee19b15472c762&=&format=webp&quality=lossless"}, {"id": 138, "name": "Júlio Bloons", "type": "aluno", "desc": "toda hora no bloons mano", "rarity": "I", "value": 130, "image": "https://media.discordapp.net/attachments/1530008046540034121/1530012334347653175/image.png?ex=6a640686&is=6a62b506&hm=480fc669d71013ab5afe25fd1486326cdd448fdc06d2e8a14bdf8f8013511b40&=&format=webp&quality=lossless&width=233&height=105"}, {"id": 139, "name": "Fabi SIGA", "type": "aluno", "desc": "fabi siga", "rarity": "C", "value": 70, "image": "https://media.discordapp.net/attachments/1512940473206051016/1531075046993301674/image.png?ex=6a67e441&is=6a6692c1&hm=14b95398c41c52840e689a11ea3fe754528bff4bf5e10a7ff8fb3c402e838e53&=&format=webp&quality=lossless"}, {"id": 140, "name": "FABIDOLG VOLTA AS AULAS", "type": "aluno", "desc": "buzão", "rarity": "I", "value": 180, "image": "https://media.discordapp.net/attachments/1512940473206051016/1537260152250564780/Untitled.png?ex=6a7e6495&is=6a7d1315&hm=dbbd0e3043fbaa8b11bec2bc85021dd6aba4e4ab6db5a8e4e11097c7d8647d45&=&format=webp&quality=lossless&width=512&height=355"}, {"id": 141, "name": "Espíndola MÃONOBOLSO", "type": "profe", "desc": "me mijei de rir", "rarity": "SSR", "value": 800, "image": "https://media.discordapp.net/attachments/1512940473206051016/1537535384966144020/image0.jpg?ex=6a84aae9&is=6a835969&hm=0f139d8d1f8b117fb6144146b354b24424d10db23a47146f62735ad4fbf763fc&=&format=webp&width=384&height=371"}, {"id": 142, "name": "Zimbrão 💀", "type": "profe", "desc": "zimbrao odeia lgpd", "rarity": "I", "value": 200, "image": "https://media.discordapp.net/attachments/1512940473206051016/1539078315586101269/image.png?ex=6a8501e1&is=6a83b061&hm=5f9339a3904bc990890f04be6027ff1ada8101981f7e88fdff75b153e6967661&=&format=webp&quality=lossless"}, {"id": 143, "name": "henricria truque de mágica", "type": "aluno", "desc": "pena que não consegue mudar minha nota de cálculo", "rarity": "I", "value": 250, "image": "https://media.discordapp.net/attachments/1512940473206051016/1539078066809217094/image.png?ex=6a8501a5&is=6a83b025&hm=a32d798132dbf1bae764e6946605a743ef02b815418d86d4d3285048d624fec9&=&format=webp&quality=lossless"}, {"id": 144, "name": "PIX DO GRÊMIO", "type": "aluno", "desc": "CELULAR: <coloca um email>", "rarity": "R", "value": 300, "image": "https://media.discordapp.net/attachments/1512940473206051016/1539077670627971082/image.png?ex=6a850147&is=6a83afc7&hm=ea138572c429d20febc6868338c3a13dd996fce2dc15037cd17cfff7fe728d8a&=&format=webp&quality=lossless"}, {"id": 145, "name": "Fluxo", "type": "meme", "desc": "trabalho escravo legalizado", "rarity": "C", "value": 25, "image": "https://media.discordapp.net/attachments/1512940473206051016/1539086199996678255/images.png?ex=6a850938&is=6a83b7b8&hm=746009df715ce3e82374c7591f4f9abffe8f0b8e7ef48cc013c0caa2bfb62ed4&=&format=webp&quality=lossless"}, {"id": 146, "name": "Consulting Club", "type": "meme", "desc": "conseguiram piorar o trabalho escravo (fluxo)", "rarity": "C", "value": 10, "image": "https://media.discordapp.net/attachments/1512940473206051016/1539086433351106670/images.png?ex=6a850970&is=6a83b7f0&hm=58f86fa3b26182e4bfca373c0c1a85d1631d97134748edc83ee495df6300bcfd&=&format=webp&quality=lossless"}, {"id": 147, "name": "Grêmio ECI", "type": "aluno", "desc": "<3", "rarity": "C", "value": 99, "image": "https://media.discordapp.net/attachments/1512940473206051016/1539087425026916482/logo-1.png?ex=6a850a5c&is=6a83b8dc&hm=a992cd170bc9d43e543ee416aa56a2901dc1c261ea7eff4015351ee41f1fc160&=&format=webp&quality=lossless"}, {"id": 148, "name": "Gerson Spotted", "type": "profe", "desc": "só comeu carne mugindo do mocellin", "rarity": "I", "value": 250, "image": "https://media.discordapp.net/attachments/1512940473206051016/1541527682523598979/image.png?ex=6a8deb07&is=6a8c9987&hm=c9fc4f35e26094ad064b430ec20724b2c16ebf3ade4091551683a52e69a96ae9&=&format=webp&quality=lossless&width=339&height=384"}, {"id": 149, "name": "MAGO XEXÉO", "type": "profe", "desc": "PEGAÇÃO = EXPULSÃO", "rarity": "SSR", "value": 900, "image": "https://media.discordapp.net/attachments/1512940473206051016/1541528439700328599/image.png?ex=6a8debbc&is=6a8c9a3c&hm=64d15c4247ecf7ff340dd3293e089e1724a970c5d54d4c037d492555de0f7d01&=&format=webp&quality=lossless"}, {"id": 150, "name": "ESPÍNDOLA YAGAMI", "type": "profe", "desc": "faltou aula dele vai virar estatística", "rarity": "SR", "value": 670, "image": "https://media.discordapp.net/attachments/1512940473206051016/1541528861953757326/image.png?ex=6a8dec20&is=6a8c9aa0&hm=3645fc0614db3440c94f20c505ec11cd54291928fc170447dd0aebd09964179f&=&format=webp&quality=lossless"}, {"id": 151, "name": "Companheiros de Busão", "type": "aluno", "desc": "✌️✌️✌️✌️✌️✌️✌️✌️✌️✌️✌️✌️✌️✌️✌️✌️✌️", "rarity": "I", "value": 150, "image": "https://media.discordapp.net/attachments/1512940473206051016/1541529299398697020/image.png?ex=6a8dec89&is=6a8c9b09&hm=ef6c7b7a8a81bae5cc18d20f976df641298c471b9abb7c6ceb36ce3d4973ba69&=&format=webp&quality=lossless"}, {"id": 152, "name": "Xexéo com óculos embolado", "type": "profe", "desc": "coitado", "rarity": "I", "value": 120, "image": "https://media.discordapp.net/attachments/1512940473206051016/1541529709425336422/image.png?ex=6a8decea&is=6a8c9b6a&hm=b6ac0dd65bfb6086a9e35016f681c7739114a2f023c21bd43b0099653b7adc30&=&format=webp&quality=lossless&width=366&height=384"}, {"id": 153, "name": "Marujo Padre", "type": "profe", "desc": "Use para abençoar o seu semestre", "rarity": "R", "value": 485, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1542538588934381598/Marujo_Padre.jpg?ex=6a919882&is=6a904702&hm=8af0c073f1f46a16961576a35d0115088390bf7bc5c53403b78fc7e987841b41"}, {"id": 154, "name": "Os crias da salinha", "type": "aluno", "desc": "salinha no seu dia mais fraco", "rarity": "R", "value": 300, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1543974326502563840/20260409_123803.jpg?ex=6a96d1a5&is=6a958025&hm=8e777b0b3afa6454aae559e4679ad8e00c002601221015c7bc484f2f13827a3c"}, {"id": 155, "name": "EC ECI", "type": "aluno", "desc": "amassamos Eletrônica", "rarity": "R", "value": 499, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1543976309816958996/IMG-20260618-WA0085.jpg?ex=6a96d37d&is=6a9581fd&hm=c8407fab41fb7715eb389dccdd6e6ec29e20e2ab771c188c899f4125c61fc018&"}, {"id": 156, "name": "Luidi vendo seu pedido de transferência", "type": "profe", "desc": "como se Comp 1 fosse o suficiente", "rarity": "I", "value": 299, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1543976311205269504/20260504_135803.jpg?ex=6a96d37e&is=6a9581fe&hm=894d8cb6c07ca805b8d2bc2e95c4b0a5228247375d340f1740ef16f988a186cd&"}, {"id": 157, "name": "O CRAC e o Júlio", "type": "meme", "desc": "Só pensa em Strognoff esse mlk", "rarity": "SR", "value": 555, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1543976310265876531/IMG-20260612-WA0008.jpg?ex=6a96d37e&is=6a9581fe&hm=5dac12cf4ad43a8d276102341f940044e24f2fa7d5b54aa986d394291f305653&"}, {"id": 158, "name": "Luidi encontrado no 485", "type": "profe", "desc": "Existe ônibus com mais aura do que esse!?!?!?", "rarity": "R", "value": 485, "image": "https://cdn.discordapp.com/attachments/1512940473206051016/1543976312639725568/20260504_091637.jpg?ex=6a96d37e&is=6a9581fe&hm=2788fb5fc83078dfbe6d36a8052ff1afb1c8a07d3830036883ee7558e95d8a7d&"}, {"id": 159, "name": "❤️💚🤍❤️💚🤍", "type": "aluno", "desc": "O Maraca é nosso ❤️💚🤍", "rarity": "I", "value": 299, "image": "https://media.discordapp.net/attachments/1512940473206051016/1543976313189044254/IMG-20260421-WA0137.jpg?ex=6a96d37e&is=6a9581fe&hm=1cfcd69d0a66a9f2fd41fc19a0bfad08cda2a935983b11ba71a0b0a26b764aa3&=&format=webp&width=480&height=640"}, {"id": 160, "name": "Karine perdendo no Poker", "type": "aluno", "desc": "Sabe nem blefar", "rarity": "I", "value": 275, "image": "https://media.discordapp.net/attachments/1512940473206051016/1543976314296471642/20260410_140531.jpg?ex=6a96d37f&is=6a9581ff&hm=dc16365ebb86683607583dda79dd7d44fc9a3f04228f73f166669b22bc61935e&=&format=webp&width=640&height=640"}, {"id": 161, "name": "Eterno Fernando 🖤", "type": "meme", "desc": "Quem é o Marujo diante desse cara?", "rarity": "R", "value": 333, "image": "https://media.discordapp.net/attachments/1512940473206051016/1543976314585874672/IMG-20260825-WA0080.jpg?ex=6a96d37f&is=6a9581ff&hm=8357d7ef8354ee7bd83d81c2276cc8b77185c7b3f971700aba7d75d58871accc&=&format=webp&width=480&height=640"}, {"id": 162, "name": "Joseph neneca", "type": "aluno", "desc": "ZZZZZZZZ", "rarity": "I", "value": 150, "image": "https://media.discordapp.net/attachments/1512940473206051016/1543976315005313134/IMG-20260825-WA0097.jpg?ex=6a96d37f&is=6a9581ff&hm=2e068e9d05582bc15165f2fef369f0a07e510dbcd420779c334e77f61bea0275&=&format=webp&width=360&height=640"}, {"id": 163, "name": "Zimbrada Sinistra", "type": "profe", "desc": "🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥", "rarity": "SSR", "value": 800, "image": "https://media.discordapp.net/attachments/1512940473206051016/1544351821299060846/image0.jpg?ex=6a983136&is=6a96dfb6&hm=a340a6c08cab1e009801e80d9eb7aeeac27426ac43533c95c50e900482c1b71d&=&format=webp"}, {"id": 164, "name": "penteou", "type": "aluno", "desc": "manter o cabelo bonito", "rarity": "C", "value": 50, "image": "https://media.discordapp.net/attachments/1512940473206051016/1541876930276761780/3faabf63-7a19-4102-b116-863524152d30_CABBB85D-A411-4A1D-91B9-446910B1760D.jpg?ex=6a986aca&is=6a97194a&hm=3038021a11a7c5dd912543fbdbf2d94ea31e57a53c7c9c8f1b459a0a5af317e8&=&format=webp"}, {"id": 165, "name": "Dolg Vasco", "type": "aluno", "desc": "imagem proibida em 15 países", "rarity": "I", "value": 200, "image": "https://media.discordapp.net/attachments/1512940473206051016/1544501795886473266/7c29a3d6-abfc-4d7a-96c1-c0256f356afe.png?ex=6a98bce3&is=6a976b63&hm=8616a672c06b9e399f64ded5f6f0ff5113c8b186c96495875ae623934a5fa3ac&=&format=webp&quality=lossless&width=384&height=384"}, {"id": 166, "name": "Luidi Palhaço", "type": "meme", "desc": "quem será que faz ele rir", "rarity": "SSR", "value": 700, "image": "https://media.discordapp.net/attachments/1512940473206051016/1544501819810648206/2e131769-280c-4549-bf63-4ac7409a9988.png?ex=6a98bce9&is=6a976b69&hm=6e785383b8914a043ea58c8fe9344574472012a6cb4dfaed4fc8901dccc132d8&=&format=webp&quality=lossless"}, {"id": 167, "name": "Pedro Ditador", "type": "profe", "desc": "top ditadores careca", "rarity": "R", "value": 350, "image": "https://media.discordapp.net/attachments/1512940473206051016/1544501846779887696/422eaf3b-2092-403e-b88b-7851a838c6ca.png?ex=6a98bcef&is=6a976b6f&hm=64396e21b6aa389bf027522d119a4b687c8cb8782bd370258817376bd33fd431&=&format=webp&quality=lossless"}, {"id": 168, "name": "aí dentro", "type": "meme", "desc": "qualquer semelhança com o luidi é mera coincidência", "rarity": "SSR", "value": 900, "image": "https://media.discordapp.net/attachments/1512940473206051016/1544501924361936917/936db96b-0a24-4788-a714-eb0ba8242f4d.png?ex=6a98bd02&is=6a976b82&hm=57a355698041019bf7137c4a94cb64fc47cae58894147546b43d7658a6e3eac4&=&format=webp&quality=lossless"}, {"id": 169, "name": "O Lobo de Irajá", "type": "aluno", "desc": "we are not the same", "rarity": "I", "value": 250, "image": "https://media.discordapp.net/attachments/1512940473206051016/1544502424302133338/image.png?ex=6a98bd79&is=6a976bf9&hm=9b78015e6cc6f47be2ed039156a03c7d48feddeb93d65ea00afc92da4eb4f471&=&format=webp&quality=lossless"}, {"id": 170, "name": "Palma Aurudo", "type": "profe", "desc": "aura clap", "rarity": "SR", "value": 600, "image": "https://media.discordapp.net/attachments/1512940473206051016/1544503561050918992/image.png?ex=6a98be88&is=6a976d08&hm=402ebc784f0157ac5838461458646a4ec9141f6ce1d4627e9116f0e4525a661b&=&format=webp&quality=lossless"}, {"id": 171, "name": "🙄🙄🙄🙄", "type": "profe", "desc": "não olhe por tanto tempo", "rarity": "SR", "value": 650, "image": "https://media.discordapp.net/attachments/1512940473206051016/1544501899200561232/6efe70d1-0c5f-476f-be69-000b25c89aaf.png?ex=6a98bcfc&is=6a976b7c&hm=b0fa32511096c5a6a78b6a17b79cfb202c0b7b36ec17c22c52c97fe6b5a380d1&=&format=webp&quality=lossless"}];
+    const SUBJECTS = {"COS111": {"name": "Introdução a ECI", "type": "Humanas", "cost": 1000, "period": 1}, "COS110": {"name": "Algoritmos e Programação", "type": "Software", "cost": 1000, "period": 1}, "EEL280": {"name": "Circuitos Lógicos", "type": "Hardware", "cost": 1000, "period": 1}, "MAC118": {"name": "Cálculo I", "type": "Exatas", "cost": 1000, "period": 1}, "FIT112": {"name": "Física I", "type": "Exatas", "cost": 1000, "period": 1}, "FIS111": {"name": "Física Experimental I", "type": "Exatas", "cost": 1000, "period": 1}, "EEL670": {"name": "Linguagens de Programação", "type": "Software", "cost": 2000, "period": 2}, "EEL480": {"name": "Sistemas Digitais", "type": "Hardware", "cost": 2000, "period": 2}, "MAE125": {"name": "Álgebra Linear II", "type": "Exatas", "cost": 2000, "period": 2}, "MAC128": {"name": "Cálculo II", "type": "Exatas", "cost": 2000, "period": 2}, "FIT122": {"name": "Física II", "type": "Exatas", "cost": 2000, "period": 2}, "FIS121": {"name": "Física Experimental II", "type": "Exatas", "cost": 2000, "period": 2}, "CO231": {"name": "Estruturas de Dados", "type": "Software", "cost": 3000, "period": 3}, "EEL580": {"name": "Arquitetura de Computadores", "type": "Hardware", "cost": 3000, "period": 3}, "EEL881": {"name": "Teoria da Computação", "type": "Software", "cost": 3000, "period": 3}, "MAC238": {"name": "Cálculo III", "type": "Exatas", "cost": 3000, "period": 3}, "FIT230": {"name": "Física III", "type": "Exatas", "cost": 3000, "period": 3}, "FIN231": {"name": "Física Experimental III", "type": "Exatas", "cost": 3000, "period": 3}, "COP232": {"name": "Gestão do Conhecimento I", "type": "Humanas", "cost": 3000, "period": 3}, "COS242": {"name": "Teoria dos Grafos", "type": "Software", "cost": 4000, "period": 4}, "COE241": {"name": "Estatíst. e Mod. Probabilístico", "type": "Exatas", "cost": 4000, "period": 4}, "MAC248": {"name": "Cálculo IV", "type": "Exatas", "cost": 4000, "period": 4}, "FIT240": {"name": "Física IV", "type": "Exatas", "cost": 4000, "period": 4}, "FIN241": {"name": "Física Experimental IV", "type": "Exatas", "cost": 4000, "period": 4}, "IQG111": {"name": "Química EE", "type": "Exatas", "cost": 4000, "period": 4}, "COS471": {"name": "Computadores e Sociedade", "type": "Humanas", "cost": 4000, "period": 4}, "EEL871": {"name": "Banco de Dados", "type": "Software", "cost": 5000, "period": 5}, "EEL770": {"name": "Sistemas Operacionais", "type": "Hardware", "cost": 5000, "period": 5}, "EEL878": {"name": "Redes de Computadores I", "type": "Hardware", "cost": 5000, "period": 5}, "COS351": {"name": "Lógica Matemática", "type": "Exatas", "cost": 5000, "period": 5}, "IQG112": {"name": "Química Experimental EE", "type": "Exatas", "cost": 5000, "period": 5}, "EEL873": {"name": "Engenharia de Software", "type": "Software", "cost": 6000, "period": 6}, "EEL879": {"name": "Redes de Computadores II", "type": "Hardware", "cost": 6000, "period": 6}, "COE364": {"name": "Telecomunicações", "type": "Hardware", "cost": 6000, "period": 6}, "COS360": {"name": "Otimização", "type": "Exatas", "cost": 6000, "period": 6}, "COC361": {"name": "Inteligência Computacional", "type": "Software", "cost": 6000, "period": 6}, "COP364": {"name": "Empreendedorismo I", "type": "Humanas", "cost": 6000, "period": 6}, "EEL418": {"name": "Programação Avançada", "type": "Software", "cost": 7000, "period": 7}, "EEL875": {"name": "Internet e Arquitetura TCP/IP", "type": "Hardware", "cost": 7000, "period": 7}, "COS470": {"name": "Sistemas Distribuídos", "type": "Software", "cost": 7000, "period": 7}, "COC472": {"name": "Computação de Alto Desempenho", "type": "Software", "cost": 7000, "period": 7}, "COC473": {"name": "Álgebra Linear Computacional", "type": "Exatas", "cost": 7000, "period": 7}, "COS482": {"name": "Qualidade de Software", "type": "Software", "cost": 8000, "period": 8}, "COS480": {"name": "Construção de Banco de Dados", "type": "Software", "cost": 8000, "period": 8}, "EEL882": {"name": "Computação Gráfica", "type": "Software", "cost": 8000, "period": 8}, "COP481": {"name": "Novos Modelos de Negócio", "type": "Humanas", "cost": 8000, "period": 8}, "EEWU00": {"name": "Estágio Obrigatório", "type": "Humanas", "cost": 9000, "period": 9}, "EEWX00": {"name": "Projeto de Graduação", "type": "Humanas", "cost": 9000, "period": 9}};
+
+    const RARITY_WEIGHTS = { 'C': 50, 'I': 30, 'R': 16, 'SR': 3, 'SSR': 1 };
+    const RARITY_COLORS = { 'C': '#7da3cc', 'I': '#10b981', 'R': '#38bdf8', 'SR': '#a78bfa', 'SSR': '#f59e0b' };
+
+    const state = {
+      points: 1000,
+      academicPeriod: 1,
+      selectedPeriod: 1,
+      completedSubjects: new Set(),
+      workspace: [],
+      currentCard: null,
+      isRolling: false,
+      catalogFilter: 'ALL',
+      cardsList: [...CARDS]
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('hud-catalog-count').innerText = state.cardsList.length;
+      renderStepper();
+      renderSubjects();
+      renderCatalog();
+      updateHUD();
+    });
+
+    function calculateBonuses() {
+      let exatasSum = 0, softwareSum = 0, hardwareSum = 0, humanasCount = 0;
+      for (let code of state.completedSubjects) {
+        const s = SUBJECTS[code];
+        if (!s) continue;
+        if (s.type === 'Exatas') exatasSum += s.period;
+        if (s.type === 'Software') softwareSum += s.period;
+        if (s.type === 'Hardware') hardwareSum += s.period;
+        if (s.type === 'Humanas') humanasCount++;
+      }
+
+      const deployMult = 1.0 + (exatasSum / 63.0);
+      const commitRedMinutes = Math.round(Math.min(1800, 24 * softwareSum) / 60);
+      const pullRedMinutes = Math.round(Math.min(1800, (1800.0 / 35.0) * hardwareSum) / 60);
+      let passive = humanasCount;
+      if (state.completedSubjects.has('EEWU00')) passive += 100;
+      if (state.completedSubjects.has('EEWX00')) passive += 500;
+
+      return {
+        deployMult,
+        deployPct: ((deployMult - 1.0) * 100).toFixed(1),
+        commitRedMinutes,
+        pullRedMinutes,
+        passive
+      };
+    }
+
+    function updateHUD() {
+      const b = calculateBonuses();
+      document.getElementById('hud-period').innerText = `${state.academicPeriod}º Período`;
+      document.getElementById('hud-points').innerText = `${state.points.toLocaleString('pt-BR')} 🪙`;
+      document.getElementById('hud-deploy-mult').innerText = `+${b.deployPct}%`;
+
+      document.getElementById('stat-deploy-val').innerText = `x${b.deployMult.toFixed(2)} (+${b.deployPct}%)`;
+      document.getElementById('stat-commit-cd').innerText = `-${b.commitRedMinutes} min`;
+      document.getElementById('stat-pull-cd').innerText = `-${b.pullRedMinutes} min`;
+      document.getElementById('stat-passive-yield').innerText = `+${b.passive} ECI / h`;
+    }
+
+    function executePull(forcedCard = null) {
+      if (state.isRolling) return;
+      state.isRolling = true;
+      document.getElementById('btn-pull').disabled = true;
+      document.getElementById('choices-row').classList.remove('active');
+
+      const card = forcedCard || rollRandomCard();
+      state.currentCard = card;
+
+      const inner = document.getElementById('card-inner');
+      inner.classList.remove('flipped');
+
+      setTimeout(() => {
+        populateFront(card);
+        inner.classList.add('flipped');
+
+        const b = calculateBonuses();
+        const deployVal = Math.round(card.value * b.deployMult);
+        document.getElementById('deploy-preview-val').innerText = `+${deployVal.toLocaleString('pt-BR')} ECI`;
+
+        document.getElementById('choices-row').classList.add('active');
+        state.isRolling = false;
+        document.getElementById('btn-pull').disabled = false;
+      }, 500);
+    }
+
+    function rollRandomCard() {
+      const r = Math.random() * 100;
+      let acc = 0, rar = 'C';
+      for (let [k, w] of Object.entries(RARITY_WEIGHTS)) {
+        acc += w;
+        if (r <= acc) { rar = k; break; }
+      }
+      let pool = state.cardsList.filter(c => c.rarity === rar);
+      if (!pool.length) pool = state.cardsList;
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+
+    function populateFront(card) {
+      const front = document.getElementById('card-front');
+      front.className = `card-plane front rarity-${card.rarity}`;
+
+      document.getElementById('card-id').innerText = '#' + String(card.id).padStart(3, '0');
+      document.getElementById('card-name').innerText = card.name;
+      document.getElementById('card-type').innerText = card.type;
+      document.getElementById('card-desc').innerText = card.desc || 'Sem notas anexadas.';
+      document.getElementById('card-rarity').innerText = card.rarity;
+      document.getElementById('card-val').innerText = `${card.value} ECI`;
+
+      const img = document.getElementById('card-img');
+      img.src = card.image || '';
+      img.dataset.name = card.name;
+    }
+
+    function executeCommit() {
+      if (!state.currentCard) return;
+      const card = state.currentCard;
+      state.workspace.unshift(card);
+      showToast(`💾 Commit: ${card.name} guardado no Workspace.`);
+
+      document.getElementById('choices-row').classList.remove('active');
+      renderShelf();
+    }
+
+    function executeDeploy() {
+      if (!state.currentCard) return;
+      const card = state.currentCard;
+      const b = calculateBonuses();
+      const val = Math.round(card.value * b.deployMult);
+      state.points += val;
+
+      showToast(`🚀 Deploy: +${val} ECI creditados!`);
+      document.getElementById('choices-row').classList.remove('active');
+      updateHUD();
+    }
+
+    function renderShelf() {
+      const deck = document.getElementById('shelf-deck');
+      document.getElementById('shelf-count').innerText = state.workspace.length;
+
+      if (!state.workspace.length) {
+        deck.innerHTML = '<div style="font-size: 0.75rem; color: var(--bp-text-muted); font-family: var(--font-mono);">Nenhum dev commitado no workspace ainda.</div>';
+        return;
+      }
+
+      deck.innerHTML = state.workspace.slice(0, 10).map(c => `
+        <div class="shelf-item">
+          <img class="shelf-thumb" src="${c.image || ''}" onerror="handleImageError(this)" data-name="${c.name}">
+          <div class="shelf-info">
+            <span class="shelf-name">${c.name}</span>
+            <span class="shelf-sub"><span style="color: ${RARITY_COLORS[c.rarity]}">${c.rarity}</span> • ${c.value} ECI</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function cursarMateria(code) {
+      const s = SUBJECTS[code];
+      if (!s) return;
+      if (state.completedSubjects.has(code)) return;
+
+      if (s.period > state.academicPeriod) {
+        showToast(`Matéria travada! Você está no ${state.academicPeriod}º período.`);
+        return;
+      }
+      if (state.points < s.cost) {
+        showToast(`ECIPoints insuficientes (${s.cost} ECI).`);
+        return;
+      }
+
+      state.points -= s.cost;
+      state.completedSubjects.add(code);
+      showToast(`Aprovado: ${s.name}!`);
+
+      // Checar se completou 100% do período atual
+      const pSubs = Object.keys(SUBJECTS).filter(k => SUBJECTS[k].period === state.academicPeriod);
+      if (pSubs.every(k => state.completedSubjects.has(k)) && state.academicPeriod < 9) {
+        state.academicPeriod++;
+        state.selectedPeriod = state.academicPeriod;
+        showToast(`🎓 Parabéns! Promovido ao ${state.academicPeriod}º Período! (+1 Pull Máx)`);
+      }
+
+      updateHUD();
+      renderStepper();
+      renderSubjects();
+    }
+
+    function renderStepper() {
+      const nav = document.getElementById('stepper-nav');
+      nav.innerHTML = '';
+      for (let p = 1; p <= 9; p++) {
+        const codes = Object.keys(SUBJECTS).filter(c => SUBJECTS[c].period === p);
+        const done = codes.filter(c => state.completedSubjects.has(c)).length;
+        const btn = document.createElement('button');
+        btn.className = `stepper-btn ${p === state.selectedPeriod ? 'active' : ''}`;
+        btn.onclick = () => {
+          state.selectedPeriod = p;
+          renderStepper();
+          renderSubjects();
+        };
+        btn.innerHTML = `<span>${p}º Período</span> <span class="pill">${done}/${codes.length}</span>`;
+        nav.appendChild(btn);
+      }
+    }
+
+    function renderSubjects() {
+      const deck = document.getElementById('subjects-deck');
+      deck.innerHTML = '';
+      const p = state.selectedPeriod;
+      const codes = Object.keys(SUBJECTS).filter(c => SUBJECTS[c].period === p);
+
+      for (let code of codes) {
+        const s = SUBJECTS[code];
+        const isDone = state.completedSubjects.has(code);
+        const isLocked = s.period > state.academicPeriod;
+        const canAfford = state.points >= s.cost;
+
+        const card = document.createElement('div');
+        card.className = `sub-item-card ${isDone ? 'done' : ''} ${isLocked ? 'locked' : ''}`;
+        card.innerHTML = `
+          <div class="sub-card-top">
+            <div>
+              <span class="sub-code">${code}</span>
+              <div class="sub-name">${s.name}</div>
+            </div>
+            <span class="sub-type-badge badge-${s.type.toLowerCase()}">${s.type}</span>
+          </div>
+
+          <div class="sub-effect-box">
+            ${
+              s.type === 'Software' ? '💻 Reduz tempo de espera do Commit (-24s)' :
+              s.type === 'Hardware' ? '🔌 Reduz intervalo de novos Pulls (-51s)' :
+              s.type === 'Exatas' ? '📈 Aumenta multiplicador de Deploy (+Exatas)' :
+              '🧪 Concede renda passiva em ECIPoints por hora'
+            }
+          </div>
+
+          <div class="sub-card-footer">
+            <span class="sub-cost">${s.cost.toLocaleString('pt-BR')} ECI</span>
+            ${
+              isDone ? '<span style="color: var(--green); font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;">✓ CONCLUÍDA</span>' :
+              isLocked ? '<span style="color: var(--bp-text-muted); font-family: var(--font-mono); font-size: 0.72rem;">BLOQUEADA</span>' :
+              `<button class="btn-bp ${canAfford ? 'primary' : ''}" onclick="cursarMateria('${code}')" ${!canAfford ? 'disabled' : ''}>
+                ${canAfford ? 'Cursar' : 'Sem Pontos'}
+              </button>`
+            }
+          </div>
+        `;
+        deck.appendChild(card);
+      }
+    }
+
+    function renderCatalog() {
+      const query = document.getElementById('catalog-search').value.toLowerCase().trim();
+      const deck = document.getElementById('catalog-deck');
+      deck.innerHTML = '';
+
+      const list = state.cardsList.filter(c => {
+        const matchQ = !query || c.name.toLowerCase().includes(query) || c.type.toLowerCase().includes(query) || String(c.id).includes(query);
+        const matchR = state.catalogFilter === 'ALL' || c.rarity === state.catalogFilter;
+        return matchQ && matchR;
+      });
+
+      for (let c of list) {
+        const item = document.createElement('div');
+        item.className = 'catalog-card-item';
+        item.onclick = () => openModal(c);
+        item.innerHTML = `
+          <img class="card-thumb" src="${c.image || ''}" onerror="handleImageError(this)" data-name="${c.name}">
+          <div style="display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.65rem;">
+            <span>#${String(c.id).padStart(3, '0')}</span>
+            <span style="font-weight: 700; color: ${RARITY_COLORS[c.rarity]}">${c.rarity}</span>
+          </div>
+          <div class="catalog-name">${c.name}</div>
+          <div class="catalog-desc">${c.desc || 'Sem notas cadastradas.'}</div>
+          <div style="margin-top: auto; border-top: 1px dashed var(--bp-line); padding-top: 0.35rem; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.72rem;">
+            <span style="color: var(--bp-text-muted); text-transform: uppercase;">${c.type}</span>
+            <span style="color: var(--amber); font-weight: 700;">${c.value} ECI</span>
+          </div>
+        `;
+        deck.appendChild(item);
+      }
+    }
+
+    function setCatalogFilter(r, btn) {
+      state.catalogFilter = r;
+      document.querySelectorAll('.filter-pills .pill-filter').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderCatalog();
+    }
+
+    let modalActiveCard = null;
+    function openModal(c) {
+      modalActiveCard = c;
+      document.getElementById('modal-id').innerText = '#' + String(c.id).padStart(3, '0');
+      document.getElementById('modal-name').innerText = c.name;
+      document.getElementById('modal-type').innerText = c.type.toUpperCase();
+      document.getElementById('modal-desc').innerText = c.desc || 'Sem notas cadastradas.';
+      document.getElementById('modal-val').innerText = c.value;
+      const img = document.getElementById('modal-img');
+      img.src = c.image || '';
+      img.dataset.name = c.name;
+      document.getElementById('modal-box').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('modal-box').classList.remove('active');
+    }
+
+    function forceRollModalCard() {
+      if (!modalActiveCard) return;
+      const c = modalActiveCard;
+      closeModal();
+      switchTab('tab-gacha');
+      executePull(c);
+    }
+
+    function switchTab(id) {
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+
+      const tabs = ['tab-gacha', 'tab-subjects', 'tab-catalog'];
+      const idx = tabs.indexOf(id);
+      if (idx !== -1) document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+    }
+
+    function handleImageError(img) {
+      const name = img.dataset.name || 'Dev';
+      const initial = name.charAt(0).toUpperCase();
+      img.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect fill="%230c1a2e" width="200" height="200"/><circle cx="100" cy="85" r="45" fill="%23193557"/><text x="100" y="98" font-family="sans-serif" font-size="36" font-weight="bold" fill="%237da3cc" text-anchor="middle">${initial}</text><rect x="40" y="145" width="120" height="40" rx="4" fill="%23193557"/></svg>`;
+    }
+
+    function showToast(msg) {
+      const box = document.getElementById('toast-box');
+      const t = document.createElement('div');
+      t.className = 'toast-pill';
+      t.innerText = msg;
+      box.appendChild(t);
+      setTimeout(() => t.remove(), 2800);
+    }
+
+    function demoAddPoints(amt) {
+      state.points += amt;
+      updateHUD();
+      renderSubjects();
+      showToast(`+${amt} ECI adicionados!`);
+    }
+
+    function demoUnlockAll() {
+      for (let k of Object.keys(SUBJECTS)) state.completedSubjects.add(k);
+      state.academicPeriod = 9;
+      state.selectedPeriod = 9;
+      updateHUD();
+      renderStepper();
+      renderSubjects();
+      showToast('Todas as 48 matérias destravadas!');
+    }
+
+    function demoReset() {
+      state.points = 1000;
+      state.academicPeriod = 1;
+      state.selectedPeriod = 1;
+      state.completedSubjects.clear();
+      state.workspace = [];
+      updateHUD();
+      renderStepper();
+      renderSubjects();
+      renderShelf();
+      document.getElementById('choices-row').classList.remove('active');
+      document.getElementById('card-inner').classList.remove('flipped');
+      showToast('Demonstração resetada.');
+    }
+  </script>
+</body>
+</html>
